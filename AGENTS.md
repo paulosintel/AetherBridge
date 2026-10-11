@@ -40,3 +40,14 @@ En este entorno, **Gemini actúa como las dos rebanadas de pan** que envuelven l
   python3 scripts/auto_update_catalog.py
   ```
 - Detecta automáticamente nuevos lanzamientos mundiales (+1,000 modelos) e inyecta los nuevos campeones en el catálogo de Codex, Claude CLI y Antigravity sin intervención manual.
+
+---
+
+## ⚡ 4. Regla Inquebrantable de Sincronización Inmediata con GitHub
+- Repositorio oficial público: `https://github.com/paulosintel/AetherBridge`
+- **Mandato:** CUALQUIER mejora técnica, corrección de bug, nuevo script o actualización de documentación realizada en el entorno local **DEBE ser sincronizada y enviada a GitHub inmediatamente** en el mismo turno mediante:
+  ```bash
+  ./scripts/sync_github.sh "<mensaje descriptivo>"
+  ```
+- Queda terminantemente prohibida cualquier desincronización entre el código local y el repositorio público.
+
