@@ -12,9 +12,10 @@ import time
 import subprocess
 import urllib.request
 
-OMNIROUTE_URL = "http://127.0.0.1:20128/v1/models"
-OMNIROUTE_TOKEN = "omniroute-secret-key-local"
-CODEX_CATALOG_PATH = "/Users/paulocbrogesl/.codex/ollama-launch-models.json"
+OMNIROUTE_URL = os.environ.get("OMNIROUTE_URL", "http://127.0.0.1:20128/v1/models")
+OMNIROUTE_TOKEN = os.environ.get("OMNIROUTE_API_KEY", os.environ.get("OMNIROUTE_LOCAL_TOKEN", "sk-115537bd46614765-e41eb2-08652b97"))
+CODEX_OMNI_CATALOG = os.path.expanduser("~/.codex/omniroute-launch-models.json")
+CODEX_OLLAMA_CATALOG = os.path.expanduser("~/.codex/ollama-launch-models.json")
 STATUS_LOG_PATH = os.path.expanduser("~/.omniroute/catalog_update_status.json")
 
 FRONTIER_PATTERNS = [
@@ -47,15 +48,14 @@ def fetch_live_models():
         print(f"[AutoUpdate] Could not fetch models from OmniRoute: {e}", file=sys.stderr)
         return []
 
-def update_codex_catalog(live_models):
-    if not os.path.exists(CODEX_CATALOG_PATH):
+def update_single_catalog(path, live_models):
+    if not os.path.exists(path):
         return 0
-
     try:
-        with open(CODEX_CATALOG_PATH, "r") as f:
+        with open(path, "r") as f:
             data = json.load(f)
     except Exception as e:
-        print(f"[AutoUpdate] Error reading Codex catalog: {e}", file=sys.stderr)
+        print(f"[AutoUpdate] Error reading catalog at {path}: {e}", file=sys.stderr)
         return 0
 
     existing_slugs = {m.get("slug") for m in data.get("models", [])}
@@ -63,7 +63,6 @@ def update_codex_catalog(live_models):
 
     added_count = 0
     for pattern, name, desc, priority, category in FRONTIER_PATTERNS:
-        # Check if matched in live catalog or if it's a known preset
         matched_live = any(pattern.lower() in lm.lower() for lm in live_models)
         slug = pattern
 
@@ -78,13 +77,31 @@ def update_codex_catalog(live_models):
             existing_slugs.add(slug)
             added_count += 1
 
-    # Sort models by priority descending
     data["models"].sort(key=lambda x: x.get("priority", 0), reverse=True)
 
-    with open(CODEX_CATALOG_PATH, "w") as f:
+    with open(path, "w") as f:
         json.dump(data, f, indent=2)
-
     return added_count
+
+def update_codex_catalog(live_models):
+    added_omni = update_single_catalog(CODEX_OMNI_CATALOG, live_models)
+    added_ollama = update_single_catalog(CODEX_OLLAMA_CATALOG, live_models)
+
+    # Ensure config.toml is locked to OmniRoute
+    config_path = os.path.expanduser("~/.codex/config.toml")
+    if os.path.exists(config_path):
+        try:
+            import re
+            with open(config_path, "r") as f:
+                c = f.read()
+            c = re.sub(r'model_catalog_json\s*=\s*"[^"]*"', f'model_catalog_json = "{CODEX_OMNI_CATALOG}"', c, count=1)
+            c = re.sub(r'openai_base_url\s*=\s*"[^"]*"', 'openai_base_url = "http://127.0.0.1:20128/v1"', c, count=1)
+            with open(config_path, "w") as f:
+                f.write(c)
+        except Exception as e:
+            print(f"[AutoUpdate] Notice updating config.toml: {e}", file=sys.stderr)
+
+    return max(added_omni, added_ollama)
 
 def sync_cli_profiles():
     env = os.environ.copy()

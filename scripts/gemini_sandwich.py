@@ -11,32 +11,33 @@ import sys
 import json
 import time
 import urllib.request
+import os
 import urllib.error
 
-OMNIROUTE_URL = "http://127.0.0.1:20128/v1/chat/completions"
-OMNIROUTE_TOKEN = "omniroute-secret-key-local"
-OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
+OMNIROUTE_URL = os.environ.get("OMNIROUTE_URL", "http://127.0.0.1:20128/v1/chat/completions")
+OMNIROUTE_TOKEN = os.environ.get("OMNIROUTE_API_KEY", os.environ.get("OMNIROUTE_LOCAL_TOKEN", "sk-115537bd46614765-e41eb2-08652b97"))
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 
 # Routing Matrix: Quality vs Latency profiles
 ROUTING_TIERS = {
     "speed": {
         "description": "Inferencia a hiper-velocidad con LPUs dedicados (sub-300ms)",
-        "models": ["auto/fast", "auto/best-fast", "groq/llama-3.3-70b-versatile"],
+        "models": ["auto/best-fast", "groq/qwen/qwen3.8-27b", "nvidia/google/gemma-4-31b-it"],
         "fallback": "llama3.2:latest"
     },
     "coding": {
         "description": "Máxima calidad de código, refactorización y depuración",
-        "models": ["auto/claude-sonnet", "auto/best-coding", "claude-3-7-sonnet"],
+        "models": ["auto/best-coding", "kr/claude-sonnet-4.5", "kr/claude-sonnet-5"],
         "fallback": "llama3.2:latest"
     },
     "reasoning": {
         "description": "Razonamiento matemático profundo, algoritmos y cadena lógica",
-        "models": ["deepseek-r1", "auto/best-reasoning", "auto/claude-opus"],
+        "models": ["auto/best-reasoning", "gc/grok-4.7", "nvidia/deepseek-ai/deepseek-v4-pro-0813"],
         "fallback": "llama3.2:latest"
     },
     "architecture": {
         "description": "Diseño de sistemas, visión holística y síntesis de alto nivel",
-        "models": ["auto/claude-opus", "auto/claude-sonnet"],
+        "models": ["kr/claude-sonnet-4.5", "auto/best-coding", "auto/claude-opus"],
         "fallback": "llama3.2:latest"
     },
     "massive_context": {

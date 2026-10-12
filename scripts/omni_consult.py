@@ -5,28 +5,31 @@ Allows Antigravity, terminal scripts, or users to invoke Claude Opus, Claude Son
 DeepSeek R1 reasoning, Gemini 2.0 Pro/Flash, and local Ollama models on demand.
 """
 
+import os
 import sys
 import json
 import argparse
 import urllib.request
 import urllib.error
 
-OMNIROUTE_URL = "http://127.0.0.1:20128/v1/chat/completions"
-OMNIROUTE_TOKEN = "omniroute-secret-key-local"
-OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
+OMNIROUTE_URL = os.environ.get("OMNIROUTE_URL", "http://127.0.0.1:20128/v1/chat/completions")
+OMNIROUTE_TOKEN = os.environ.get("OMNIROUTE_API_KEY", os.environ.get("OMNIROUTE_LOCAL_TOKEN", "sk-115537bd46614765-e41eb2-08652b97"))
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 
 MODEL_SHORTCUTS = {
     "opus": "auto/claude-opus",
-    "sonnet": "auto/claude-sonnet",
-    "haiku": "auto/claude-haiku",
+    "sonnet": "kr/claude-sonnet-4.5",
+    "haiku": "kr/claude-haiku-4.5",
     "coding": "auto/best-coding",
     "reasoning": "auto/best-reasoning",
-    "fast": "auto/fast",
-    "free": "auto/best-free",
-    "r1": "deepseek-r1",
-    "deepseek": "deepseek-v3",
+    "fast": "auto/best-fast",
+    "free": "auto/best-fast",
+    "r1": "auto/best-reasoning",
+    "deepseek": "nvidia/deepseek-ai/deepseek-v4-pro-0813",
+    "grok": "gc/grok-4.7",
     "gemini": "gemini-2.0-flash",
-    "llama": "llama-3.3-70b-instruct",
+    "gemma": "nvidia/google/gemma-4-31b-it",
+    "qwen": "groq/qwen/qwen3.8-27b",
     "local": "llama3.2:latest",
     "offline": "llama3.2:latest"
 }

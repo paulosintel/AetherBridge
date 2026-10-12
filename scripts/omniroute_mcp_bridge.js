@@ -9,7 +9,7 @@ const http = require('http');
 const readline = require('readline');
 
 const OMNIROUTE_URL = process.env.OMNIROUTE_URL || 'http://127.0.0.1:20128';
-const OMNIROUTE_TOKEN = process.env.OMNIROUTE_TOKEN || 'omniroute-secret-key-local';
+const OMNIROUTE_TOKEN = process.env.OMNIROUTE_API_KEY || process.env.OMNIROUTE_TOKEN || process.env.OMNIROUTE_LOCAL_TOKEN || 'sk-115537bd46614765-e41eb2-08652b97';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
 
 function httpRequest(urlStr, options, data) {

@@ -51,7 +51,15 @@ PORT=${OMNIROUTE_PORT:-20128}
 echo -ne "\n[3/5] Verificando Gateway OmniRoute en puerto ${PORT}... "
 if curl -s http://localhost:${PORT}/v1/models >/dev/null 2>&1 || curl -s http://localhost:${PORT}/health >/dev/null 2>&1; then
     echo -e "${GREEN}ONLINE y RESPONDIENDO (localhost:${PORT})${NC}"
-    MODELS_COUNT=$(curl -s -H "Authorization: Bearer omniroute-secret-key-local" http://localhost:${PORT}/v1/models 2>/dev/null | grep -o '"id":' | wc -l | tr -d ' ')
+    TOKEN="${OMNIROUTE_API_KEY:-}"
+    if [ -z "$TOKEN" ] && [ -f "api_keys.env" ]; then
+        TOKEN=$(grep -E '^OMNIROUTE_LOCAL_TOKEN=' api_keys.env | cut -d'=' -f2 | tr -d '"'\'' ')
+    fi
+    if [ -z "$TOKEN" ] && [ -f "${HOME}/.omniroute/.env" ]; then
+        TOKEN=$(grep -E '^OMNIROUTE_API_KEY=' "${HOME}/.omniroute/.env" | cut -d'=' -f2 | tr -d '"'\'' ')
+    fi
+    TOKEN="${TOKEN:-sk-115537bd46614765-e41eb2-08652b97}"
+    MODELS_COUNT=$(curl -s -H "Authorization: Bearer ${TOKEN}" http://localhost:${PORT}/v1/models 2>/dev/null | grep -o '"id":' | wc -l | tr -d ' ')
     if [ "$MODELS_COUNT" -gt 0 ]; then
         echo -e "      Catálogo activo: ${MODELS_COUNT} modelos disponibles vía AetherBridge."
     fi
