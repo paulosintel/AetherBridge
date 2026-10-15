@@ -13,7 +13,7 @@ import subprocess
 import urllib.request
 
 OMNIROUTE_URL = os.environ.get("OMNIROUTE_URL", "http://127.0.0.1:20128/v1/models")
-OMNIROUTE_TOKEN = os.environ.get("OMNIROUTE_API_KEY", os.environ.get("OMNIROUTE_LOCAL_TOKEN", "sk-115537bd46614765-e41eb2-08652b97"))
+OMNIROUTE_TOKEN = os.environ.get("OMNIROUTE_API_KEY", os.environ.get("OMNIROUTE_LOCAL_TOKEN", "omniroute-secret-key-local"))
 CODEX_OMNI_CATALOG = os.path.expanduser("~/.codex/omniroute-launch-models.json")
 CODEX_OLLAMA_CATALOG = os.path.expanduser("~/.codex/ollama-launch-models.json")
 STATUS_LOG_PATH = os.path.expanduser("~/.omniroute/catalog_update_status.json")
