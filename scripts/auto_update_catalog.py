@@ -125,8 +125,12 @@ def update_codex_catalog(live_models):
 def sync_cli_profiles():
     env = os.environ.copy()
     env["OMNIROUTE_API_KEY"] = OMNIROUTE_TOKEN
-    subprocess.run(["omniroute", "setup-codex", "--api-key", OMNIROUTE_TOKEN], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    subprocess.run(["omniroute", "setup-claude", "--api-key", OMNIROUTE_TOKEN], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    omni_bin = "/usr/local/bin/omniroute" if os.path.exists("/usr/local/bin/omniroute") else "omniroute"
+    try:
+        subprocess.run([omni_bin, "setup-codex", "--api-key", OMNIROUTE_TOKEN], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([omni_bin, "setup-claude", "--api-key", OMNIROUTE_TOKEN], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception as e:
+        print(f"[AutoUpdate] Notice syncing CLI profiles: {e}", file=sys.stderr)
 
 def main():
     start = time.time()
