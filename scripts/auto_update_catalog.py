@@ -73,9 +73,14 @@ def update_single_catalog(path, live_models):
             new_entry["description"] = f"{desc} [{'Live Verified' if matched_live else 'Gateway Route'}]"
             new_entry["priority"] = priority
             new_entry["visibility"] = "list"
+            new_entry["model_provider"] = "omniroute"
             data["models"].append(new_entry)
             existing_slugs.add(slug)
             added_count += 1
+
+    # Ensure every model in the catalog is bound to omniroute provider
+    for m in data.get("models", []):
+        m["model_provider"] = "omniroute"
 
     data["models"].sort(key=lambda x: x.get("priority", 0), reverse=True)
 
@@ -87,7 +92,7 @@ def update_codex_catalog(live_models):
     added_omni = update_single_catalog(CODEX_OMNI_CATALOG, live_models)
     added_ollama = update_single_catalog(CODEX_OLLAMA_CATALOG, live_models)
 
-    # Ensure config.toml is locked to OmniRoute
+    # Ensure config.toml is locked to OmniRoute without breaking websocket bridge
     config_path = os.path.expanduser("~/.codex/config.toml")
     if os.path.exists(config_path):
         try:
@@ -96,6 +101,20 @@ def update_codex_catalog(live_models):
                 c = f.read()
             c = re.sub(r'model_catalog_json\s*=\s*"[^"]*"', f'model_catalog_json = "{CODEX_OMNI_CATALOG}"', c, count=1)
             c = re.sub(r'openai_base_url\s*=\s*"[^"]*"', 'openai_base_url = "http://127.0.0.1:20128/v1"', c, count=1)
+            
+            # Ensure top-level model_provider = "omniroute"
+            if "model_provider =" not in c:
+                c = re.sub(r'(model\s*=\s*"[^"]*"\n)', r'\1model_provider = "omniroute"\n', c, count=1)
+            
+            # Ensure [model_providers.omniroute] has supports_websockets = false
+            if "[model_providers.omniroute]" in c:
+                if "supports_websockets" not in c:
+                    c = re.sub(
+                        r'(\[model_providers\.omniroute\][\s\S]*?requires_openai_auth\s*=\s*false)',
+                        r'\1\nsupports_websockets = false',
+                        c,
+                        count=1
+                    )
             with open(config_path, "w") as f:
                 f.write(c)
         except Exception as e:
