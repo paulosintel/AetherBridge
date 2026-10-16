@@ -31,7 +31,7 @@ if command -v ollama >/dev/null 2>&1; then
     fi
 else
     echo -e "${RED}NO INSTALADO.${NC}"
-    echo -e "      Tip macOS: brew install ollama | Linux: curl -fsSL https://ollama.com/install.sh | sh"
+    echo -e "      Tip Windows: winget install Ollama.Ollama | macOS: brew install ollama | Linux: curl -fsSL https://ollama.com/install.sh | sh"
 fi
 
 # 2. Verificar archivo de claves API

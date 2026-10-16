@@ -66,7 +66,7 @@ Tu asistente:
 Una vez que tu asistente termine de instalar todo:
 
 #### 1. Para usar Claude en tu consola (Claude CLI):
-1. Abre tu terminal.
+1. Abre tu terminal (en Windows: Terminal o PowerShell; en Mac/Linux: Terminal).
 2. Escribe:
    ```bash
    claude
@@ -78,11 +78,38 @@ Apunta el modelo personalizado a la dirección local que tu asistente dejó conf
 
 #### 3. Para consultar cualquier modelo desde la terminal:
 Hemos incluido un comando súper simple. Solo escribe:
-```bash
-python3 scripts/aether_consult.py -m fast "¿Cuál es la capital de Francia?"
-python3 scripts/aether_consult.py -m r1 "Resuelve este problema matemático paso a paso"
-python3 scripts/aether_consult.py -m local "Explícame este concepto sin conexión a internet"
-```
+- **En Windows:**
+  ```powershell
+  python scripts\aether_consult.py -m fast "¿Cuál es la capital de Francia?"
+  python scripts\aether_consult.py -m r1 "Resuelve este problema matemático paso a paso"
+  python scripts\aether_consult.py -m local "Explícame este concepto sin conexión a internet"
+  ```
+- **En macOS / Linux:**
+  ```bash
+  python3 scripts/aether_consult.py -m fast "¿Cuál es la capital de Francia?"
+  python3 scripts/aether_consult.py -m r1 "Resuelve este problema matemático paso a paso"
+  python3 scripts/aether_consult.py -m local "Explícame este concepto sin conexión a internet"
+  ```
+
+---
+
+## 💻 Guía Rápida para Usuarios de Windows (Huawei, Lenovo, HP, Dell, etc.)
+
+> **¡Buenas noticias!** No necesitas instalar Linux, ni máquinas virtuales, ni configurar WSL2. AetherBridge corre **100% de forma nativa en Windows 10 y Windows 11**.
+
+### Los 3 pasos en Windows:
+1. **Instala Ollama para Windows:**  
+   Descarga el instalador oficial desde [ollama.com/download/windows](https://ollama.com/download/windows) y dale a Siguiente, Siguiente. (O abre PowerShell y escribe `winget install Ollama.Ollama`).
+2. **Instala Node.js (si no lo tienes):**  
+   Descárgalo desde [nodejs.org](https://nodejs.org/) versión LTS (o escribe `winget install OpenJS.NodeJS`).
+3. **Pega el Prompt Maestro en tu asistente:**  
+   Abre esta carpeta en tu editor (**Antigravity**, **Codex**, etc.), abre [`PROMPT_MAESTRO.md`](PROMPT_MAESTRO.md), cópialo y pégalo en el chat.  
+   Tu asistente detectará Windows y configurará todo de manera transparente.
+4. **Comprobación con un solo clic:**  
+   En Windows puedes simplemente hacer doble clic sobre el archivo [`scripts/verify_setup.bat`](scripts/verify_setup.bat) o ejecutar en PowerShell:
+   ```powershell
+   python scripts\verify_setup.py
+   ```
 
 ---
 
@@ -92,6 +119,8 @@ python3 scripts/aether_consult.py -m local "Explícame este concepto sin conexi�
   No. Solo utilizas los tiers gratuitos oficiales que no requieren tarjeta de crédito y modelos locales que corren en tu propio disco duro.
 - **¿Qué pasa si me quedo sin internet?**  
   AetherBridge detecta la desconexión automáticamente y enruta tus peticiones al modelo local de Ollama para que sigas trabajando.
+- **En Windows me sale error diciendo que 'python3' no se reconoce:**  
+  En Windows el comando oficial suele ser `python` (sin el 3) o `py`. Por ejemplo: `python scripts\verify_setup.py`.
 - **¿Qué hago si algo falla?**  
   Solo copia el mensaje que te salga, pégalo en tu asistente y dile: *"Oye, ocurrió esto, por favor arréglalo"*.
 

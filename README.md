@@ -7,7 +7,7 @@
 [![Cost](https://img.shields.io/badge/Cost-%240%20(Free%20Tiers%20%2B%20Local)-brightgreen.svg)](#4-proveedores-cloud-con-tiers-gratuitos-generosos)
 [![Models](https://img.shields.io/badge/Models-%2B300%20Live%20Frontier-orange.svg)](#catálogo-de-modelos)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blueviolet.svg)](CONTRIBUTING.md)
-[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows%20(WSL2)-lightgrey.svg)](#requisitos-del-sistema)
+[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows%20(Nativo%20%2B%20WSL2)-lightgrey.svg)](#requisitos-del-sistema)
 
 ---
 
@@ -17,6 +17,8 @@
 > [!TIP]
 > 👤 **¿Es tu primera vez o no tienes experiencia técnica previa con la terminal?**  
 > Consulta la [**Guía Rápida para Principiantes (Paso a Paso)**](GUIA_PARA_PRINCIPIANTES.md).  
+> 💻 **¿Usas Windows (Huawei, Lenovo, Dell, HP, etc.)?**  
+> Consulta la sección dedicada en la [**Guía de Principiantes para Windows**](GUIA_PARA_PRINCIPIANTES.md#-guía-rápida-para-usuarios-de-windows-huawei-lenovo-hp-dell-etc) (¡100% nativo, sin necesidad de WSL ni Linux!).  
 > 🤖 **¿Quieres que tu asistente de IA lo instale y configure todo por ti en 3 minutos?**  
 > Copia directamente el [**Prompt Maestro de Autodespliegue**](PROMPT_MAESTRO.md).
 
@@ -114,22 +116,42 @@ flowchart TD
 ## 3. Requisitos del Sistema e Instalación de Dependencias
 
 ### Requisitos Mínimos
-- **Sistema Operativo:** macOS (Apple Silicon M1/M2/M3/M4 o Intel), Linux (Ubuntu, Debian, Fedora, Arch), o Windows con WSL2.
+- **Sistema Operativo:**
+  - **Windows:** Windows 10 o Windows 11 (**100% Nativo** vía PowerShell/Terminal, o con WSL2).
+  - **macOS:** Apple Silicon (M1/M2/M3/M4) o Intel.
+  - **Linux:** Ubuntu, Debian, Fedora, Arch, etc.
 - **Node.js:** Versión 18 o superior.
 - **Python:** Versión 3.10 o superior.
 
 ### Instalación de Componentes Base (Paso único)
 
-```bash
-# 1. Instalar el motor Gateway OmniRoute
-npm install -g omniroute
+- **En Windows (PowerShell / Terminal):**
+  ```powershell
+  # 1. Instalar Ollama y Node.js con winget (o descarga directa desde sus webs)
+  winget install Ollama.Ollama
+  winget install OpenJS.NodeJS
 
-# 2. Instalar Ollama para soporte offline
-# En macOS:
-brew install ollama
-# En Linux:
-curl -fsSL https://ollama.com/install.sh | sh
-```
+  # 2. Instalar el motor Gateway OmniRoute
+  npm install -g omniroute
+  ```
+
+- **En macOS (Terminal):**
+  ```bash
+  # 1. Instalar Ollama y Node con Homebrew
+  brew install ollama node
+
+  # 2. Instalar el motor Gateway OmniRoute
+  npm install -g omniroute
+  ```
+
+- **En Linux (Bash):**
+  ```bash
+  # 1. Instalar Ollama
+  curl -fsSL https://ollama.com/install.sh | sh
+
+  # 2. Instalar el motor Gateway OmniRoute
+  npm install -g omniroute
+  ```
 
 ---
 
@@ -144,9 +166,8 @@ No necesitas configurar servidores manualmente. Gracias al **Prompt Maestro**, t
    ```
 
 2. **Prepara tus claves gratuitas:**
-   ```bash
-   cp api_keys.env.example api_keys.env
-   ```
+   - En Windows (PowerShell): `Copy-Item api_keys.env.example api_keys.env`
+   - En macOS / Linux: `cp api_keys.env.example api_keys.env`
    *(Añade al menos 1 clave de [Google AI Studio](https://aistudio.google.com/app/apikey) o [Groq](https://console.groq.com/keys)).*
 
 3. **Ejecuta el Prompt Maestro:**  
@@ -163,21 +184,27 @@ No necesitas configurar servidores manualmente. Gracias al **Prompt Maestro**, t
 ### A. Para Claude CLI (Claude Code)
 Claude CLI admite de forma nativa la redirección de endpoint mediante la variable de entorno `ANTHROPIC_BASE_URL`.
 
-Añade a tu archivo `~/.zshrc` o `~/.bashrc`:
-```bash
-export ANTHROPIC_BASE_URL="http://localhost:20128"
-export ANTHROPIC_AUTH_TOKEN="sk-aetherbridge"
-```
+- **En Windows (PowerShell - Configuración Persistente):**
+  ```powershell
+  [System.Environment]::SetEnvironmentVariable('ANTHROPIC_BASE_URL', 'http://localhost:20128', 'User')
+  [System.Environment]::SetEnvironmentVariable('ANTHROPIC_AUTH_TOKEN', 'sk-aetherbridge', 'User')
+  ```
 
-O en la configuración de Claude (`~/.claude/settings.json`):
-```json
-{
-  "env": {
-    "ANTHROPIC_BASE_URL": "http://localhost:20128",
-    "ANTHROPIC_AUTH_TOKEN": "sk-aetherbridge"
+- **En macOS / Linux (Añadir a `~/.zshrc` o `~/.bashrc`):**
+  ```bash
+  export ANTHROPIC_BASE_URL="http://localhost:20128"
+  export ANTHROPIC_AUTH_TOKEN="sk-aetherbridge"
+  ```
+
+- **O directamente en la configuración de Claude (`~/.claude/settings.json` o `%USERPROFILE%\.claude\settings.json`):**
+  ```json
+  {
+    "env": {
+      "ANTHROPIC_BASE_URL": "http://localhost:20128",
+      "ANTHROPIC_AUTH_TOKEN": "sk-aetherbridge"
+    }
   }
-}
-```
+  ```
 
 > [!NOTE]
 > **¿Qué es `sk-aetherbridge`?**  
@@ -196,29 +223,34 @@ En la configuración de modelos de Codex:
 
 La carpeta [`scripts/`](scripts/) incluye utilidades de nivel de producción listas para usar:
 
-### 1. Diagnóstico del Sistema (`scripts/verify_setup.sh`)
-Verifica con un solo comando que Ollama, el gateway, tus claves API y Claude CLI estén en verde:
+### 1. Diagnóstico del Sistema Universal (`scripts/verify_setup.py`)
+Verifica con un solo comando que Ollama, el gateway, tus claves API y Claude CLI estén en verde en cualquier sistema:
 ```bash
-./scripts/verify_setup.sh
+# Universal (Windows, macOS, Linux):
+python scripts/verify_setup.py
+
+# En Windows: También puedes hacer doble clic en scripts\verify_setup.bat o ejecutar .\scripts\verify_setup.ps1
+# En macOS/Linux: También puedes ejecutar ./scripts/verify_setup.sh
 ```
 
 ### 2. Consulta Rápida Multi-Modelo (`scripts/aether_consult.py`)
 Envía consultas instantáneas a modelos de élite desde tu terminal sin abrir navegadores:
 ```bash
 # Inferencia a hiper-velocidad con LPUs (Groq/Cerebras)
-python3 scripts/aether_consult.py -m fast "Explica la diferencia entre proceso e hilo"
+python scripts/aether_consult.py -m fast "Explica la diferencia entre proceso e hilo"
 
 # Razonamiento matemático con DeepSeek R1
-python3 scripts/aether_consult.py -m r1 "Demuestra si la suma de dos números impares es par"
+python scripts/aether_consult.py -m r1 "Demuestra si la suma de dos números impares es par"
 
 # Inferencia 100% privada sin conexión a internet (Ollama)
-python3 scripts/aether_consult.py -m local "Resume este texto en 3 puntos"
+python scripts/aether_consult.py -m local "Resume este texto en 3 puntos"
 ```
+*(Nota en macOS/Linux: Puedes usar `python3` en lugar de `python`).*
 
 ### 3. Motor Sándwich Gemini (`scripts/gemini_sandwich.py`)
 Ejecuta la orquestación multi-modelo con evaluación automática de latencia vs calidad:
 ```bash
-python3 scripts/gemini_sandwich.py --mode auto "Refactoriza este algoritmo para complejidad O(n)"
+python scripts/gemini_sandwich.py --mode auto "Refactoriza este algoritmo para complejidad O(n)"
 ```
 
 ### 4. Servidor Model Context Protocol (`scripts/omniroute_mcp_bridge.js`)
