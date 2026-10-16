@@ -15,8 +15,10 @@ En este entorno, **Gemini actúa como las dos rebanadas de pan** que envuelven l
   - **Prioridad Código & Refactorización:** Delega a **Claude 3.7 / 3.5 Sonnet** (`auto/claude-sonnet` / `auto/best-coding`).
   - **Prioridad Razonamiento Lógico / Matemático:** Delega a **DeepSeek R1** (`deepseek-r1` / `auto/best-reasoning`).
   - **Prioridad Arquitectura de Sistemas:** Delega a **Claude Opus** (`auto/claude-opus`).
-  - **Prioridad Contexto Masivo (1M tokens):** Delega a **Gemini 2.0 Pro / Flash**.
-  - **Respaldo Offline:** Delega a **Ollama Local** (`llama3.2:latest`).
+  - **Prioridad Contexto Masivo (1M tokens):** Delega a **Gemini 3.1 Flash Lite / 2.0 Pro**.
+  - **Código Local Privado (Apple Silicon M2):** Delega a **Ollama Local** (`qwen2.5-coder:3b` a 42 tok/s).
+  - **Razonamiento Lógico Local (Apple Silicon M2):** Delega a **Ollama Local** (`deepseek-r1:1.5b` a 75 tok/s con `<think>`).
+  - **Respaldo Offline General:** Delega a **Ollama Local** (`llama3.2:latest`).
 
 - **Ingrediente Central (Especialista AetherBridge / OmniRoute):**
   Se ejecuta el modelo seleccionado a costo $0 mediante:
