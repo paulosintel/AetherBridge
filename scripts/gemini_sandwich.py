@@ -15,40 +15,40 @@ import os
 import urllib.error
 
 OMNIROUTE_URL = os.environ.get("OMNIROUTE_URL", "http://127.0.0.1:20128/v1/chat/completions")
-OMNIROUTE_TOKEN = os.environ.get("OMNIROUTE_API_KEY", os.environ.get("OMNIROUTE_LOCAL_TOKEN", "sk-115537bd46614765-e41eb2-08652b97"))
+OMNIROUTE_TOKEN = os.environ.get("OMNIROUTE_API_KEY", os.environ.get("OMNIROUTE_LOCAL_TOKEN", "omniroute-secret-key-local"))
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 
 # Routing Matrix: Quality vs Latency profiles
 ROUTING_TIERS = {
     "speed": {
         "description": "Inferencia a hiper-velocidad con LPUs dedicados (sub-300ms)",
-        "models": ["auto/best-fast", "groq/qwen/qwen3.8-27b", "nvidia/google/gemma-4-31b-it"],
+        "models": ["auto/best-fast", "groq/qwen/qwen3.8-27b", "gemini/gemini-3.1-flash-lite"],
         "fallback": "llama3.2:latest"
     },
     "coding": {
         "description": "Máxima calidad de código, refactorización y depuración",
-        "models": ["auto/best-coding", "kr/claude-sonnet-4.5", "kr/claude-sonnet-5"],
-        "fallback": "llama3.2:latest"
+        "models": ["claude-3-5-sonnet-latest", "gemini/gemini-3.1-flash-lite", "auto/best-coding"],
+        "fallback": "qwen2.5-coder:3b"
     },
     "reasoning": {
         "description": "Razonamiento matemático profundo, algoritmos y cadena lógica",
-        "models": ["auto/best-reasoning", "gc/grok-4.7", "nvidia/deepseek-ai/deepseek-v4-pro-0813"],
-        "fallback": "llama3.2:latest"
+        "models": ["deepseek-r1", "auto/best-reasoning", "gemini/gemini-3.1-flash-lite"],
+        "fallback": "deepseek-r1:1.5b"
     },
     "architecture": {
         "description": "Diseño de sistemas, visión holística y síntesis de alto nivel",
-        "models": ["kr/claude-sonnet-4.5", "auto/best-coding", "auto/claude-opus"],
-        "fallback": "llama3.2:latest"
+        "models": ["claude-3-5-sonnet-latest", "auto/claude-opus", "gemini/gemini-3.1-flash-lite"],
+        "fallback": "qwen2.5-coder:3b"
     },
     "massive_context": {
         "description": "Análisis de documentos masivos y contexto ultra-largo (1M tokens)",
-        "models": ["gemini-2.0-flash", "auto/best-fast"],
+        "models": ["gemini/gemini-3.1-flash-lite", "auto/best-fast"],
         "fallback": "llama3.2:latest"
     },
     "offline": {
         "description": "100% privado en hardware local sin internet",
-        "models": ["llama3.2:latest"],
-        "fallback": "llama3.2:latest"
+        "models": ["ollama-local/qwen2.5-coder:3b", "ollama-local/deepseek-r1:1.5b", "ollama-local/llama3.2:latest"],
+        "fallback": "qwen2.5-coder:3b"
     }
 }
 

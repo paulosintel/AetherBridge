@@ -35,6 +35,8 @@ FRONTIER_PATTERNS = [
     ("auto/best-reasoning", "OmniRoute Best Reasoning (Auto-Fallback)", "Multi-provider cascade for deep logic and math", 119, "combo"),
     ("auto/fast", "OmniRoute Ultra-Fast (LPU Fallback)", "Sub-250ms inference cascade across fastest chips", 118, "combo"),
     ("auto/best-free", "OmniRoute Best Free (Zero-Cost)", "Cascades strictly across 100% free tiers", 117, "combo"),
+    ("qwen2.5-coder:3b", "Qwen 2.5 Coder 3B (Ollama Local)", "High-speed local coding model (Apple Silicon optimized)", 92, "offline"),
+    ("deepseek-r1:1.5b", "DeepSeek R1 1.5B (Ollama Local)", "Local chain-of-thought reasoning engine on Apple Silicon", 91, "offline"),
     ("llama3.2:latest", "Llama 3.2 (Ollama Local - 100% Offline)", "Local private model running directly on Apple Silicon", 90, "offline")
 ]
 

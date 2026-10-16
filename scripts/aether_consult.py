@@ -13,23 +13,25 @@ import urllib.request
 import urllib.error
 
 OMNIROUTE_URL = os.environ.get("OMNIROUTE_URL", "http://127.0.0.1:20128/v1/chat/completions")
-OMNIROUTE_TOKEN = os.environ.get("OMNIROUTE_API_KEY", os.environ.get("OMNIROUTE_LOCAL_TOKEN", "sk-115537bd46614765-e41eb2-08652b97"))
+OMNIROUTE_TOKEN = os.environ.get("OMNIROUTE_API_KEY", os.environ.get("OMNIROUTE_LOCAL_TOKEN", "omniroute-secret-key-local"))
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 
 MODEL_SHORTCUTS = {
     "opus": "auto/claude-opus",
-    "sonnet": "kr/claude-sonnet-4.5",
-    "haiku": "kr/claude-haiku-4.5",
+    "sonnet": "claude-3-5-sonnet-latest",
+    "haiku": "claude-3-5-haiku-20241022",
     "coding": "auto/best-coding",
     "reasoning": "auto/best-reasoning",
     "fast": "auto/best-fast",
     "free": "auto/best-fast",
-    "r1": "auto/best-reasoning",
-    "deepseek": "nvidia/deepseek-ai/deepseek-v4-pro-0813",
-    "grok": "gc/grok-4.7",
-    "gemini": "gemini-2.0-flash",
-    "gemma": "nvidia/google/gemma-4-31b-it",
-    "qwen": "groq/qwen/qwen3.8-27b",
+    "r1": "deepseek-r1",
+    "r1-local": "ollama-local/deepseek-r1:1.5b",
+    "local-r1": "ollama-local/deepseek-r1:1.5b",
+    "deepseek-local": "ollama-local/deepseek-r1:1.5b",
+    "qwen": "ollama-local/qwen2.5-coder:3b",
+    "coder": "ollama-local/qwen2.5-coder:3b",
+    "local-coder": "ollama-local/qwen2.5-coder:3b",
+    "gemini": "gemini/gemini-3.1-flash-lite",
     "local": "llama3.2:latest",
     "offline": "llama3.2:latest"
 }
