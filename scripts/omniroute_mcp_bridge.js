@@ -9,7 +9,7 @@ const http = require('http');
 const readline = require('readline');
 
 const OMNIROUTE_URL = process.env.OMNIROUTE_URL || 'http://127.0.0.1:20128';
-const OMNIROUTE_TOKEN = process.env.OMNIROUTE_API_KEY || process.env.OMNIROUTE_TOKEN || process.env.OMNIROUTE_LOCAL_TOKEN || 'sk-115537bd46614765-e41eb2-08652b97';
+const OMNIROUTE_TOKEN = process.env.OMNIROUTE_API_KEY || process.env.OMNIROUTE_TOKEN || process.env.OMNIROUTE_LOCAL_TOKEN || 'omniroute-secret-key-local';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
 
 function httpRequest(urlStr, options, data) {
@@ -82,7 +82,7 @@ const TOOLS = [
   },
   {
     name: 'ask_gemini_frontier',
-    description: 'Query Google Gemini 2.0 Pro / Flash via Google AI Studio free tier with massive context window (up to 1M tokens).',
+    description: 'Query Google Gemini 3.1 Flash Lite via Google AI Studio free tier with massive context window (up to 1M tokens) and zero cost.',
     inputSchema: {
       type: 'object',
       required: ['prompt'],
@@ -94,7 +94,7 @@ const TOOLS = [
   },
   {
     name: 'ask_omniroute_council',
-    description: 'Query any of the 350+ models or smart auto-fallbacks (auto/best-coding, auto/best-reasoning, auto/fast, auto/best-free).',
+    description: 'Query any of the 1,000+ models or smart auto-fallbacks (auto/best-coding, auto/best-reasoning, auto/fast, auto/best-free) via AetherBridge OmniRoute.',
     inputSchema: {
       type: 'object',
       required: ['prompt'],
@@ -110,19 +110,19 @@ const TOOLS = [
   },
   {
     name: 'ask_ollama_local',
-    description: 'Execute prompt completely offline using local Ollama model directly on this laptop without internet.',
+    description: 'Execute prompt completely offline using local models in Ollama on Apple Silicon M2: "qwen2.5-coder:3b" (coding at 42 tok/s), "deepseek-r1:1.5b" (reasoning at 75 tok/s), or "llama3.2:latest" (general).',
     inputSchema: {
       type: 'object',
       required: ['prompt'],
       properties: {
         prompt: { type: 'string', description: 'The prompt to process offline' },
-        model: { type: 'string', description: 'Local model name (default: "llama3.2:latest")' }
+        model: { type: 'string', description: 'Local model name: "qwen2.5-coder:3b", "deepseek-r1:1.5b", or "llama3.2:latest" (default: "qwen2.5-coder:3b")' }
       }
     }
   },
   {
     name: 'list_ecosystem_models',
-    description: 'List available models and smart combos from OmniRoute (300+ providers) and local Ollama.',
+    description: 'List available models and smart combos from AetherBridge OmniRoute (1,000+ providers) and local Ollama.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -132,7 +132,7 @@ const TOOLS = [
   },
   {
     name: 'sandwich_orchestration',
-    description: 'Sandwich Architecture: Gemini acts as the bread (evaluates latency vs quality) and dynamically delegates to the optimal ingredient (Claude Sonnet for code, DeepSeek R1 for reasoning, Groq LPU for sub-250ms speed, Claude Opus for architecture).',
+    description: 'Sandwich Architecture: Gemini acts as the bread (evaluates latency vs quality) and dynamically delegates to the optimal ingredient (Claude Sonnet or Qwen Coder for code, DeepSeek R1 for reasoning, Groq LPU for sub-250ms speed, Claude Opus for architecture).',
     inputSchema: {
       type: 'object',
       required: ['prompt'],
@@ -178,7 +178,7 @@ async function handleToolCall(name, args) {
     }
 
     if (name === 'ask_claude_sonnet') {
-      const output = await callOmniRouteChat('auto/claude-sonnet', args.prompt, args.system);
+      const output = await callOmniRouteChat('claude-3-5-sonnet-latest', args.prompt, args.system);
       return { content: [{ type: 'text', text: `[Claude Sonnet Response via OmniRoute]:\n\n${output}` }] };
     }
 
@@ -188,8 +188,8 @@ async function handleToolCall(name, args) {
     }
 
     if (name === 'ask_gemini_frontier') {
-      const output = await callOmniRouteChat('gemini-2.0-flash', args.prompt, args.system);
-      return { content: [{ type: 'text', text: `[Gemini 2.0 Frontier Response via OmniRoute]:\n\n${output}` }] };
+      const output = await callOmniRouteChat('gemini/gemini-3.1-flash-lite', args.prompt, args.system);
+      return { content: [{ type: 'text', text: `[Gemini 3.1 Flash Lite via OmniRoute]:\n\n${output}` }] };
     }
 
     if (name === 'ask_omniroute_council') {
@@ -199,7 +199,11 @@ async function handleToolCall(name, args) {
     }
 
     if (name === 'ask_ollama_local') {
-      const model = args.model || 'llama3.2:latest';
+      let model = args.model || 'qwen2.5-coder:3b';
+      if (model === 'qwen' || model === 'coder') model = 'qwen2.5-coder:3b';
+      if (model === 'r1' || model === 'deepseek') model = 'deepseek-r1:1.5b';
+      if (model === 'llama') model = 'llama3.2:latest';
+
       const res = await httpRequest(`${OLLAMA_URL}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
@@ -223,7 +227,7 @@ async function handleToolCall(name, args) {
       const topCombos = [
         'auto/claude-opus', 'auto/claude-sonnet', 'auto/claude-haiku',
         'auto/best-coding', 'auto/best-reasoning', 'auto/best-fast',
-        'auto/best-free', 'auto/offline', 'llama3.2:latest'
+        'auto/best-free', 'qwen2.5-coder:3b (Ollama Local)', 'deepseek-r1:1.5b (Ollama Local)', 'llama3.2:latest (Ollama Local)'
       ];
       return {
         content: [{
