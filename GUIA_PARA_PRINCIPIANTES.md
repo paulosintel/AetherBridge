@@ -91,6 +91,11 @@ Hemos incluido un comando súper simple. Solo escribe:
   python3 scripts/aether_consult.py -m local "Explícame este concepto sin conexión a internet"
   ```
 
+#### 4. Para usar la aplicación oficial de Claude Escritorio (Claude Desktop):
+Si prefieres usar la app de ventana oficial de Claude en lugar de la terminal:
+1. Agrega nuestro puente MCP a tu archivo `claude_desktop_config.json` (las instrucciones detalladas están en el [README.md](README.md#b-para-claude-escritorio-claude-desktop-oficial)).
+2. ¡Listo! Verás un icono de herramientas con el cual puedes pedirle a Claude que resuelva problemas con **DeepSeek R1**, analice documentos gigantes con **Gemini 3.1 (1M tokens)** o trabaje sin internet con tus **modelos locales de Ollama**.
+
 ---
 
 ## 💻 Guía Rápida para Usuarios de Windows (Huawei, Lenovo, HP, Dell, etc.)
@@ -115,6 +120,13 @@ Hemos incluido un comando súper simple. Solo escribe:
 
 ## ❓ Preguntas Frecuentes
 
+- **¿Cómo sé exactamente qué modelo me está respondiendo en Claude?**  
+  AetherBridge incluye una directiva de transparencia obligatoria. En la primera línea de cada respuesta, Claude colocará un banner informativo como este:
+  `> 🌉 [AetherBridge] Modelo: Claude 3.7 Sonnet | Backend: OmniRoute Cloud`  
+  O si estás sin internet:  
+  `> 🌉 [AetherBridge] Modelo Local: Qwen 2.5 Coder 3B | Backend: Ollama Local (Offline)`
+- **¿Por qué antes tenía que reparar Claude todos los días y ahora no?**  
+  Porque antes las configuraciones se perdían al cerrar la terminal y un límite de cuota bloqueaba todo. AetherBridge configuró demonios en segundo plano que inician con tu computadora, guardó las conexiones de forma fija en tus archivos de usuario y cuenta con un sistema de relevos en cascada: si una empresa satura su servicio, salta a otra en 50 milisegundos y finalmente a Ollama local. Claude nunca se queda colgado.
 - **¿Esto me cobrará algo en el futuro?**  
   No. Solo utilizas los tiers gratuitos oficiales que no requieren tarjeta de crédito y modelos locales que corren en tu propio disco duro.
 - **¿Qué pasa si me quedo sin internet?**  

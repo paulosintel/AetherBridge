@@ -30,12 +30,15 @@
 2. [Arquitectura del Sistema & Protocolo Sándwich](#2-arquitectura-del-sistema--protocolo-sándwich)
 3. [Requisitos del Sistema e Instalación de Dependencias](#3-requisitos-del-sistema-e-instalación-de-dependencias)
 4. [Despliegue en 3 Minutos: Tu Agente como SysAdmin](#4-despliegue-en-3-minutos-tu-agente-como-sysadmin)
-5. [Cableado de Clientes (Claude CLI y Codex)](#5-cableado-de-clientes-claude-cli-y-codex)
-6. [El Toolkit de AetherBridge (Scripts Clave)](#6-el-toolkit-de-aetherbridge-scripts-clave)
-7. [Proveedores Cloud con Tiers Gratuitos Generosos](#7-proveedores-cloud-con-tiers-gratuitos-generosos)
-8. [Matriz de Resiliencia y Fallback Automático](#8-matriz-de-resiliencia-y-fallback-automático)
-9. [Preguntas Frecuentes, Seguridad y Tokens Locales](#9-preguntas-frecuentes-seguridad-y-tokens-locales)
-10. [Licencia y Contribución](#10-licencia-y-contribución)
+5. [Catálogo Maestro de Modelos por Cliente (OmniRoute + Ollama)](#5-catálogo-maestro-de-modelos-por-cliente-omniroute--ollama)
+6. [Cableado de Clientes (Claude CLI, Claude Desktop, Codex y Antigravity)](#6-cableado-de-clientes-claude-cli-claude-desktop-codex-y-antigravity)
+7. [Directiva de Transparencia Obligatoria (Banners para Claude)](#7-directiva-de-transparencia-obligatoria-banners-para-claude)
+8. [La Solución Definitiva: El Fin de Reparar Claude a Diario](#8-la-solución-definitiva-el-fin-de-reparar-claude-a-diario)
+9. [El Toolkit de AetherBridge (Scripts Clave)](#9-el-toolkit-de-aetherbridge-scripts-clave)
+10. [Proveedores Cloud con Tiers Gratuitos Generosos](#10-proveedores-cloud-con-tiers-gratuitos-generosos)
+11. [Matriz de Resiliencia y Fallback Automático](#11-matriz-de-resiliencia-y-fallback-automático)
+12. [Preguntas Frecuentes, Seguridad y Tokens Locales](#12-preguntas-frecuentes-seguridad-y-tokens-locales)
+13. [Licencia y Contribución](#13-licencia-y-contribución)
 
 ---
 
@@ -179,12 +182,53 @@ No necesitas configurar servidores manualmente. Gracias al **Prompt Maestro**, t
 
 ---
 
-## 5. Cableado de Clientes (Claude CLI y Codex)
+---
+
+## 5. Catálogo Maestro de Modelos por Cliente (OmniRoute + Ollama)
+
+AetherBridge unifica dos mundos: **más de 1,000 modelos frontera en la nube a costo $0** y **modelos locales ultrarrápidos y 100% privados** que corren en tu propio disco duro.
+
+### 🌐 A. Modelos Frontera en la Nube (Vía OmniRoute Gateway en `:20128`)
+
+| Identificador de Modelo | Tipo / Proveedor | Especialidad Técnica | Velocidad / Ventana |
+| :--- | :--- | :--- | :--- |
+| **`claude-3-7-sonnet`** | Anthropic (Cloud) | Razonamiento híbrido de última generación y codificación premier | Alta precisión |
+| **`claude-3-5-sonnet-latest`** | Anthropic (Cloud) | El estándar indiscutido de ingeniería de software y refactorización | Contexto 200k |
+| **`auto/claude-opus`** | Anthropic (Cloud) | Macro-arquitectura de sistemas complejos y síntesis profunda | Máxima abstracción |
+| **`deepseek-r1`** | DeepSeek (Cloud) | Campeón mundial en matemáticas, algoritmos y lógica formal | Cadena de razonamiento |
+| **`deepseek-v3`** | DeepSeek (Cloud) | Modelo general de frontera para programación y chat | Ultra-eficiente |
+| **`gemini/gemini-3.1-flash-lite`** | Google AI Studio | Ventana colosal de contexto, lectura masiva de repositorios enteros | **1 Millón de tokens** |
+| **`gemini-2.0-pro`** | Google AI Studio | Razonamiento multimodal y análisis de código en proyectos masivos | **1 Millón de tokens** |
+| **`groq/qwen/qwen3.8-27b`** | Groq LPU | Inferencia instantánea en hardware acelerado | **Sub-250ms (+1,000 tok/s)** |
+| **`llama-3.3-70b`** | Cerebras LPU | El modelo abierto más rápido del mundo en chip de oblea | **+1,800 tokens/seg** |
+
+#### 🔀 Cascadas Inteligentes (Smart Combos sin Costo)
+- **`auto/best-coding`**: Conmuta automáticamente entre Claude 3.7 Sonnet, Qwen 2.5 Coder y Gemini Flash para programar.
+- **`auto/best-reasoning`**: Cascada optimizada para demostraciones matemáticas y algoritmos (DeepSeek R1 / o3-mini).
+- **`auto/fast`**: Cascada ultra-veloz entre chips LPU de Groq y Cerebras.
+- **`auto/best-free`**: Enruta exclusivamente a través de proveedores con límite gratuito perpetuo.
+
+---
+
+### 💻 B. Modelos Locales y 100% Privados (Vía Ollama en `:11434`)
+*No requieren internet, no tienen cuotas ni límites, y jamás comparten tus archivos o código:*
+
+| Modelo Local | Optimización | Especialidad | Rendimiento Local (Apple Silicon / PC) |
+| :--- | :--- | :--- | :--- |
+| **`qwen2.5-coder:3b`** | Local (Ollama) | Programación, depuración, sintaxis de código y scripts | **42 tokens/segundo** |
+| **`deepseek-r1:1.5b`** | Local (Ollama) | Razonamiento lógico paso a paso con bloques `<think>` | **75 tokens/segundo** |
+| **`llama3.2:latest`** | Local (Ollama) | Redacción, resúmenes, traducción y asistencia general | Inferencia instantánea |
+
+---
+
+## 6. Cableado de Clientes (Claude CLI, Claude Desktop, Codex y Antigravity)
+
+Todos tus entornos de desarrollo pueden consumir este ecosistema unificado al mismo tiempo:
 
 ### A. Para Claude CLI (Claude Code)
-Claude CLI admite de forma nativa la redirección de endpoint mediante la variable de entorno `ANTHROPIC_BASE_URL`.
+Claude CLI permite redefinir el endpoint base mediante `ANTHROPIC_BASE_URL`.
 
-- **En Windows (PowerShell - Configuración Persistente):**
+- **En Windows (PowerShell - Persistente para tu usuario):**
   ```powershell
   [System.Environment]::SetEnvironmentVariable('ANTHROPIC_BASE_URL', 'http://localhost:20128', 'User')
   [System.Environment]::SetEnvironmentVariable('ANTHROPIC_AUTH_TOKEN', 'sk-aetherbridge', 'User')
@@ -196,7 +240,7 @@ Claude CLI admite de forma nativa la redirección de endpoint mediante la variab
   export ANTHROPIC_AUTH_TOKEN="sk-aetherbridge"
   ```
 
-- **O directamente en la configuración de Claude (`~/.claude/settings.json` o `%USERPROFILE%\.claude\settings.json`):**
+- **O directamente en tu archivo de configuración de Claude (`~/.claude/settings.json` o `%USERPROFILE%\.claude\settings.json`):**
   ```json
   {
     "env": {
@@ -206,20 +250,104 @@ Claude CLI admite de forma nativa la redirección de endpoint mediante la variab
   }
   ```
 
-> [!NOTE]
-> **¿Qué es `sk-aetherbridge`?**  
-> Al correr de forma local en tu máquina (`localhost`), AetherBridge no requiere una contraseña remota. Puedes usar cualquier identificador de token (por ejemplo `sk-aetherbridge` o `omniroute-secret-key-local`). Funciona como una llave local transparente.
+---
 
-### B. Para Codex (Escritorio / CLI)
-En la configuración de modelos de Codex:
-- **Provider:** Custom OpenAI Compatible
-- **Base URL:** `http://localhost:20128/v1`
-- **API Key:** `sk-aetherbridge`
-- **Model:** `auto/best-coding` o el modelo que prefieras del catálogo.
+### B. Para Claude Escritorio (Claude Desktop Oficial)
+Aunque la aplicación gráfica oficial de Claude tiene cerrado el endpoint principal, **soporta de forma nativa el Model Context Protocol (MCP)**.  
+Con nuestro puente MCP [`scripts/omniroute_mcp_bridge.js`](scripts/omniroute_mcp_bridge.js), Claude Desktop obtiene acceso instantáneo a todas las herramientas:
+
+1. Abre el archivo de configuración de Claude Desktop:
+   - **En macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **En Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+2. Pega la configuración del servidor MCP:
+   ```json
+   {
+     "mcpServers": {
+       "aetherbridge": {
+         "command": "node",
+         "args": [
+           "/ABSOLUTE/PATH/TO/AetherBridge/scripts/omniroute_mcp_bridge.js"
+         ],
+         "env": {
+           "OMNIROUTE_URL": "http://127.0.0.1:20128",
+           "OMNIROUTE_TOKEN": "sk-aetherbridge",
+           "OLLAMA_URL": "http://127.0.0.1:11434"
+         }
+       }
+     }
+   }
+   ```
+3. Reinicia Claude Desktop. Verás un icono de martillo 🔨 con las herramientas:
+   - `sandwich_orchestration`: Ejecuta la orquestación Sándwich completa.
+   - `ask_deepseek_r1_reasoning`: Resuelve problemas lógicos y matemáticos.
+   - `ask_gemini_frontier`: Pasa documentos de 1M de tokens a Gemini 3.1 Flash Lite.
+   - `ask_ollama_local`: Ejecuta consultas offline en `qwen2.5-coder:3b` o `deepseek-r1:1.5b`.
+   - `ask_omniroute_council`: Consulta cualquiera de los +1,000 modelos del catálogo.
 
 ---
 
-## 6. El Toolkit de AetherBridge (Scripts Clave)
+### C. Para Codex (Escritorio / CLI)
+En la configuración de proveedores de Codex:
+- **Provider:** Custom OpenAI Compatible
+- **Base URL:** `http://localhost:20128/v1`
+- **API Key:** `sk-aetherbridge`
+- **Model:** `auto/best-coding`, `auto/best-reasoning`, `claude-3-7-sonnet`, o cualquier modelo del catálogo.
+
+---
+
+### D. Para Antigravity IDE
+Antigravity se integra directamente mediante el servidor MCP [`scripts/omniroute_mcp_bridge.js`](scripts/omniroute_mcp_bridge.js) y la habilidad nativa del Consejo Multi-Modelo [`omniroute-council`](.agents/skills/omniroute-council/SKILL.md).
+
+---
+
+## 7. Directiva de Transparencia Obligatoria (Banners para Claude)
+
+Para que siempre sepas con certeza **qué modelo está contestando**, si se activó el **Protocolo Sándwich**, o si estás operando en **Ollama local**, se ha configurado la siguiente directiva en [`CLAUDE.md`](CLAUDE.md) (y puedes pegarla en las "Instrucciones Personalizadas" de Claude Desktop):
+
+> **Instrucción de Transparencia:**  
+> Al inicio de cada respuesta sustancial o al cambiar de motor/herramienta, incluye un banner en la primera línea:
+> - `> 🌉 **[AetherBridge]** Modelo: **Claude 3.7 / 3.5 Sonnet** | Backend: **OmniRoute Cloud Gateway**`
+> - `> 🌉 **[AetherBridge]** Protocolo: **Sándwich (Orquestador Gemini + Especialista DeepSeek R1)**`
+> - `> 🌉 **[AetherBridge]** Modelo Local: **Qwen 2.5 Coder 3B** | Backend: **Ollama Local (Offline / Privado)**`
+> - `> 🌉 **[AetherBridge]** Respaldo Activo: **Fallback automático activado por cuota hacia Groq LPU**`
+
+---
+
+## 8. La Solución Definitiva: El Fin de Reparar Claude a Diario
+
+> **¿Por qué antes era una pesadilla y tenías que reparar Claude casi todos los días?**
+
+1. **Sesiones de Terminal Efímeras:**  
+   Al ejecutar `export ANTHROPIC_BASE_URL=...` en la terminal, la configuración se borraba al cerrar la ventana o reiniciar el equipo. Al día siguiente, Claude intentaba conectarse a Anthropic oficial y pedía suscripción.
+2. **Caída por Límites de Cuota (Error HTTP 429):**  
+   Si una clave gratuita de Groq o Gemini se saturaba temporalmente, Claude CLI abortaba de inmediato con un error fatal y quedaba inutilizable.
+3. **Muerte Silenciosa del Gateway:**  
+   Si el proceso de OmniRoute se detenía en segundo plano, el puerto 20128 se cerraba y Claude arrojaba error de conexión de red `ECONNREFUSED`.
+4. **Desactualización de Modelos:**  
+   Cuando los proveedores actualizaban versiones de modelos (ej. Gemini 1.5 a 2.0 / 3.1), las llamadas hardcodeadas quedaban obsoletas arrojando errores 404.
+
+### 🛡️ Cómo AetherBridge Erradica este Problema de Raíz:
+
+1. **Persistencia del Gateway (Auto-Arranque con el Sistema):**  
+   - En macOS: Se incluye el demonio LaunchAgent `com.omniroute.serve` que inicia el gateway automáticamente al encender el ordenador.
+   - En Windows: Se ejecuta como servicio persistente o tarea programada.
+2. **Configuración en Archivo de Usuario (No Variables Volátiles):**  
+   AetherBridge escribe de forma fija en `~/.claude/settings.json` o `%USERPROFILE%\.claude\settings.json`. Aunque reinicies tu máquina o abras 50 terminales distintas, Claude CLI siempre sabrá conectarse a AetherBridge.
+3. **Cascada Inmortal Anti-429 (Matriz de Resiliencia):**  
+   OmniRoute intercepta cualquier error de cuota. Si Groq se satura, salta en 50 milisegundos a Cerebras; si Cerebras se satura, a Gemini; si se corta internet, salta a Ollama local. **Claude jamás recibe un error 429 ni se congela.**
+4. **Auto-Actualizador Autónomo de Catálogo (`auto_update_catalog.py`):**  
+   Un demonio en segundo plano escanea cada 6 horas el catálogo mundial, detecta nuevos lanzamientos de modelos y los inyecta en los perfiles de tus clientes sin que muevas un dedo.
+5. **Diagnóstico y Reparación en 1 Solo Clic:**  
+   Si alguna vez tienes dudas, ejecutas:
+   ```bash
+   python scripts/verify_setup.py
+   # En Windows: doble clic en scripts\verify_setup.bat
+   ```
+   El script audita los 5 puntos críticos en 2 segundos y te indica exactamente la solución.
+
+---
+
+## 9. El Toolkit de AetherBridge (Scripts Clave)
 
 La carpeta [`scripts/`](scripts/) incluye utilidades de nivel de producción listas para usar:
 
@@ -254,14 +382,14 @@ python scripts/gemini_sandwich.py --mode auto "Refactoriza este algoritmo para c
 ```
 
 ### 4. Servidor Model Context Protocol (`scripts/omniroute_mcp_bridge.js`)
-Permite que herramientas como **Antigravity** o **Claude Desktop** utilicen estos más de 300 modelos como herramientas (*tools*) nativas.
+Permite que herramientas como **Antigravity** o **Claude Desktop** utilicen estos más de 1,000 modelos como herramientas (*tools*) nativas.
 
 ### 5. Actualizador Autónomo de Catálogo (`scripts/auto_update_catalog.py`)
 Sincroniza y detecta nuevos modelos lanzados a nivel global cada 6 horas, inyectándolos en los perfiles de tus agentes automáticamente.
 
 ---
 
-## 7. Proveedores Cloud con Tiers Gratuitos Generosos
+## 10. Proveedores Cloud con Tiers Gratuitos Generosos
 
 Obtén tus credenciales gratuitas oficiales (la mayoría no requieren tarjeta de crédito):
 
@@ -276,7 +404,7 @@ Obtén tus credenciales gratuitas oficiales (la mayoría no requieren tarjeta de
 
 ---
 
-## 8. Matriz de Resiliencia y Fallback Automático
+## 11. Matriz de Resiliencia y Fallback Automático
 
 ```mermaid
 flowchart LR
@@ -292,20 +420,22 @@ Si una empresa aplica un límite de tasa (*rate limit*), AetherBridge conmuta si
 
 ---
 
-## 9. Preguntas Frecuentes, Seguridad y Tokens Locales
+## 12. Preguntas Frecuentes, Seguridad y Tokens Locales
 
 ### ¿Mis claves API están seguras?
 **Sí, absolutamente.** AetherBridge y el gateway se ejecutan **100% en tu máquina local (`localhost`)**. Tus claves nunca viajan a servidores de terceros; se envían exclusivamente de forma directa y cifrada por HTTPS a las APIs oficiales de Google, Groq, etc. Además, el archivo `api_keys.env` está explícitamente ignorado en `.gitignore`.
 
-### ¿Por qué usamos Claude CLI en vez de la app oficial de Claude Escritorio?
-La aplicación de escritorio oficial de Anthropic está cerrada de fábrica para usar únicamente los servidores de pago de Anthropic. En cambio, **Claude CLI (Claude Code)** respeta el estándar `ANTHROPIC_BASE_URL`, permitiendo redirigir todas las peticiones a AetherBridge y trabajar con cualquier modelo sin pagar suscripciones fijas.
+### ¿Puedo usar tanto Claude CLI como la aplicación oficial de Claude Escritorio?
+**¡Sí, totalmente!**  
+- **Claude CLI (Terminal):** Se conecta como tu copiloto de ingeniería mediante la variable `ANTHROPIC_BASE_URL` apuntando al puerto local `20128`.
+- **Claude Escritorio (App Oficial):** Se conecta mediante el protocolo MCP utilizando nuestro puente [`scripts/omniroute_mcp_bridge.js`](scripts/omniroute_mcp_bridge.js), lo que te permite consultar a DeepSeek R1, Gemini 3.1 con 1M tokens, y tus modelos locales de Ollama con un clic desde el chat oficial de Claude.
 
 ### ¿Qué ocurre si no configuro todas las claves?
 AetherBridge funciona con las claves que tengas. Incluso si solo configuras Google AI Studio o únicamente usas Ollama local sin internet, el sistema se adaptará y enrutará según los recursos disponibles.
 
 ---
 
-## 10. Licencia y Contribución
+## 13. Licencia y Contribución
 
 Este proyecto está liberado bajo la **[Licencia MIT](LICENSE)**. Creemos en una inteligencia artificial abierta, accesible y democratizada para todos los desarrolladores del mundo.
 
