@@ -2,7 +2,14 @@
 """
 OmniRoute Automatic Frontier Model Catalog Synchronizer
 Scans live providers from OmniRoute, discovers new state-of-the-art models,
-and automatically updates Codex, Claude CLI, and Antigravity profiles.
+and automatically updates Codex, Claude CLI, and Antigravity profiles with
+next-gen frontier titans:
+- DeepSeek V4 & R2 (Claude Opus / Sonnet Equiv)
+- GLM-5.1 / 5.2 / 5.3-Flash Z.ai (Claude Opus 4.6 Equiv)
+- Kimi K3 / K2.6 Moonshot (Claude Sonnet / Fable Equiv)
+- Qwen 3 / 3.6 235B MoE & Coder (Claude Sonnet Equiv)
+- Gemini 2.5 Pro / Flash (Claude Opus / Sonnet Equiv)
+- Nemotron 3 Ultra / gpt-oss-120b (Claude Sonnet Equiv)
 """
 
 import os
@@ -20,6 +27,19 @@ STATUS_LOG_PATH = os.path.expanduser("~/.omniroute/catalog_update_status.json")
 
 FRONTIER_PATTERNS = [
     # (regex/substring, display_name, description, priority, category)
+    ("deepseek-v4-pro", "DeepSeek V4 Pro (Claude Opus/Sonnet Flagship)", "Next-gen frontier reasoning, mathematics and code intelligence", 125, "frontier"),
+    ("deepseek-v4-flash", "DeepSeek V4 Flash (Claude Sonnet Equiv)", "Ultra-fast next-gen coding and agile debugging", 124, "coding"),
+    ("deepseek-r2", "DeepSeek R2 (Claude Opus/Sonnet Reasoning)", "Next-gen chain-of-thought deep logic and mathematical proofs", 123, "reasoning"),
+    ("glm-5.3-flash", "GLM-5.3-Flash Z.ai (Claude Opus 4.6 Equiv)", "Extreme reasoning, autonomous systems architecture and macro synthesis", 122, "architecture"),
+    ("glm-5.2", "GLM-5.2 Z.ai (Claude Opus 4.6 Equiv)", "Deep systemic reasoning and structural design", 121, "architecture"),
+    ("kimi-k3", "Kimi K3 Moonshot AI (Claude Sonnet / Fable Equiv)", "Ultra-long context repository reasoning and code synthesis", 120, "context"),
+    ("kimi-k2.6", "Kimi K2.6 Moonshot AI (Claude Sonnet / Fable Equiv)", "Massive code ingestion and technical precision", 119, "context"),
+    ("qwen-3.6-coder", "Qwen 3.6 Coder 235B MoE (Claude Sonnet Equiv)", "Premier 235B MoE code generation and repository engineering", 118, "coding"),
+    ("qwen-3-235b", "Qwen 3 235B MoE (Claude Sonnet Equiv)", "Massive multi-task MoE frontier intelligence", 117, "general"),
+    ("gemini-2.5-pro", "Gemini 2.5 Pro (Claude Opus/Sonnet Equiv)", "Premier multimodal reasoning with 2M+ token context", 116, "context"),
+    ("gemini-2.5-flash", "Gemini 2.5 Flash (Claude Sonnet Equiv)", "Sub-second multimodal inference with massive context", 115, "speed"),
+    ("nemotron-3-ultra", "Nemotron 3 Ultra (Claude Sonnet Equiv)", "NVIDIA high-performance reasoning and enterprise code alignment", 114, "coding"),
+    ("gpt-oss-120b", "gpt-oss-120b (Claude Sonnet Equiv)", "Leading open-weight 120B parameter programming flagship", 113, "coding"),
     ("claude-3-7-sonnet", "Claude 3.7 Sonnet (Anthropic Flagship)", "Hybrid reasoning and premier coding model", 110, "coding"),
     ("claude-3-5-sonnet", "Claude 3.5 Sonnet (Anthropic)", "State of the art coding and engineering", 108, "coding"),
     ("claude-3-opus", "Claude 3 Opus (Anthropic)", "Deep architectural reasoning and synthesis", 105, "architecture"),
@@ -31,10 +51,10 @@ FRONTIER_PATTERNS = [
     ("gpt-4o", "OpenAI GPT-4o", "Omni multimodal flagship", 96, "general"),
     ("llama-3.3-70b", "Meta Llama 3.3 70B (Groq/Cerebras LPU)", "Fastest open model via hardware acceleration", 95, "speed"),
     ("qwen-2.5-coder-32b", "Qwen 2.5 Coder 32B (Leading Open Coder)", "Premier code generation and repository engineering", 94, "coding"),
-    ("auto/best-coding", "OmniRoute Best Coding (Auto-Fallback)", "Zero-cost multi-provider cascade for programming", 120, "combo"),
-    ("auto/best-reasoning", "OmniRoute Best Reasoning (Auto-Fallback)", "Multi-provider cascade for deep logic and math", 119, "combo"),
-    ("auto/fast", "OmniRoute Ultra-Fast (LPU Fallback)", "Sub-250ms inference cascade across fastest chips", 118, "combo"),
-    ("auto/best-free", "OmniRoute Best Free (Zero-Cost)", "Cascades strictly across 100% free tiers", 117, "combo"),
+    ("auto/best-coding", "OmniRoute Best Coding (Auto-Fallback)", "Zero-cost multi-provider cascade for programming", 130, "combo"),
+    ("auto/best-reasoning", "OmniRoute Best Reasoning (Auto-Fallback)", "Multi-provider cascade for deep logic and math", 129, "combo"),
+    ("auto/fast", "OmniRoute Ultra-Fast (LPU Fallback)", "Sub-250ms inference cascade across fastest chips", 128, "combo"),
+    ("auto/best-free", "OmniRoute Best Free (Zero-Cost)", "Cascades strictly across 100% free tiers", 127, "combo"),
     ("qwen2.5-coder:3b", "Qwen 2.5 Coder 3B (Ollama Local)", "High-speed local coding model (Apple Silicon optimized)", 92, "offline"),
     ("deepseek-r1:1.5b", "DeepSeek R1 1.5B (Ollama Local)", "Local chain-of-thought reasoning engine on Apple Silicon", 91, "offline"),
     ("llama3.2:latest", "Llama 3.2 (Ollama Local - 100% Offline)", "Local private model running directly on Apple Silicon", 90, "offline")
@@ -148,11 +168,14 @@ def main():
         "status": "success"
     }
 
-    os.makedirs(os.path.dirname(STATUS_LOG_PATH), exist_ok=True)
-    with open(STATUS_LOG_PATH, "w") as f:
-        json.dump(status, f, indent=2)
+    try:
+        os.makedirs(os.path.dirname(STATUS_LOG_PATH), exist_ok=True)
+        with open(STATUS_LOG_PATH, "w") as f:
+            json.dump(status, f, indent=2)
+    except Exception:
+        pass
 
-    print(f"Catalog sync completed in {status['duration_sec']}s. Total live models: {len(live_models)}.")
+    print(f"[AutoUpdate] Catalog updated successfully: {len(live_models)} live models scanned, {added_to_codex} new models registered.")
 
 if __name__ == "__main__":
     main()

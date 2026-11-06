@@ -7,15 +7,28 @@ AetherBridge democratiza el acceso a la IA conectando clientes de desarrollo (Cl
 
 ---
 
-## 🥪 2. El Paradigma del Sándwich de Inteligencia Artificial
+## 🥪 2. El Paradigma del Sándwich de Inteligencia Artificial (Titanes de Frontera)
 En este entorno, **Gemini actúa como las dos rebanadas de pan** que envuelven la ejecución:
 - **Pan Superior (Evaluador & Enrutador Inteligente - Gemini):**
-  Gemini analiza el objetivo del usuario evaluando la tensión entre **Calidad de Respuesta** y **Tiempo de Ejecución**:
-  - **Prioridad Latencia / Respuestas Instantáneas:** Delega a chips LPU en la nube (**Groq / Cerebras** vía `auto/fast`).
-  - **Prioridad Código & Refactorización:** Delega a **Claude 3.7 / 3.5 Sonnet** (`auto/claude-sonnet` / `auto/best-coding`).
-  - **Prioridad Razonamiento Lógico / Matemático:** Delega a **DeepSeek R1** (`deepseek-r1` / `auto/best-reasoning`).
-  - **Prioridad Arquitectura de Sistemas:** Delega a **Claude Opus** (`auto/claude-opus`).
-  - **Prioridad Contexto Masivo (1M tokens):** Delega a **Gemini 3.1 Flash Lite / 2.0 Pro**.
+  Gemini analiza el objetivo del usuario con **doble modalidad de activación**:
+  
+  ### A. Activación por Mención Directa en Chat:
+  Si el usuario escribe en su prompt el modelo o familia deseada, el sistema lo activa inmediatamente:
+  - **`deepseek v4` / `v4 pro` / `v4 flash` / `deepseek r2`**: Enruta a la familia DeepSeek de última generación.
+  - **`glm-5` / `glm 5.3 flash` / `z.ai`**: Enruta a GLM (Claude Opus 4.6 equiv).
+  - **`kimi` / `kimi k3` / `kimi k2.6` / `moonshot`**: Enruta a Moonshot Kimi (Claude Sonnet / Fable equiv).
+  - **`qwen 3` / `qwen 3.6 coder` / `qwen 235b`**: Enruta a Qwen MoE Coder (Claude Sonnet equiv).
+  - **`gemini 2.5 pro` / `gemini 2.5 flash`**: Enruta a Gemini 2.5 multimodal masivo.
+  - **`nemotron` / `nemotron 3 ultra` / `gpt-oss-120b`**: Enruta a Nemotron 3 Ultra (Claude Sonnet equiv).
+  - Modelos clásicos: `opus`, `sonnet`, `deepseek r1`, `groq`, `ollama local`.
+
+  ### B. Decisión Autónoma por Complejidad:
+  Si el usuario no especifica modelo, Gemini calcula la complejidad multidimensional:
+  - **Complejidad Arquitectónica & Macro-Diseño:** Delega a **GLM-5.3-Flash** (Claude Opus 4.6 equiv) o **Claude Opus**.
+  - **Complejidad Lógica & Matemática Formal:** Delega a **DeepSeek R2** (Claude Opus/Sonnet equiv) o **DeepSeek V4 Pro**.
+  - **Ingeniería de Software & Código Complejo:** Delega a **Qwen 3.6 Coder 235B MoE** (Claude Sonnet equiv) o **Nemotron 3 Ultra**.
+  - **Contexto Masivo & Repositorios Extensos:** Delega a **Gemini 2.5 Pro** o **Kimi K3 (Moonshot)**.
+  - **Velocidad Extrema / Sub-segundo:** Delega a **Gemini 2.5 Flash**, **GLM-5.3-Flash** o **Groq LPU**.
   - **Código Local Privado (Apple Silicon M2):** Delega a **Ollama Local** (`qwen2.5-coder:3b` a 42 tok/s).
   - **Razonamiento Lógico Local (Apple Silicon M2):** Delega a **Ollama Local** (`deepseek-r1:1.5b` a 75 tok/s con `<think>`).
   - **Respaldo Offline General:** Delega a **Ollama Local** (`llama3.2:latest`).
@@ -23,16 +36,16 @@ En este entorno, **Gemini actúa como las dos rebanadas de pan** que envuelven l
 - **Ingrediente Central (Especialista AetherBridge / OmniRoute):**
   Se ejecuta el modelo seleccionado a costo $0 mediante:
   ```bash
-  python3 scripts/gemini_sandwich.py --mode [auto|speed|coding|reasoning|architecture] "<prompt>"
+  python3 scripts/gemini_sandwich.py --mode [auto|v4|r2|glm|kimi|qwen|gemini25|nemotron|speed|coding|reasoning|architecture] "<prompt>"
   ```
   o mediante el CLI de consulta directa:
   ```bash
-  python3 scripts/aether_consult.py -m [opus|sonnet|r1|gemini|coding|local] "<prompt>"
+  python3 scripts/aether_consult.py -m [v4|r2|glm5|kimi|qwen3|gemini25|nemotron|opus|sonnet|r1|local] "<prompt>"
   ```
-  o la herramienta MCP `sandwich_orchestration`.
+  o las herramientas MCP de OmniRoute (`sandwich_orchestration`, `ask_deepseek_v4_r2`, `ask_glm_family`, `ask_kimi_moonshot`, `ask_qwen_3_coder`, `ask_gemini_2_5`, `ask_nemotron_ultra`).
 
 - **Pan Inferior (Validador & Sintetizador - Gemini):**
-  Gemini audita el código o razonamiento devuelto por el ingrediente, verifica que cumpla con las restricciones del proyecto y lo entrega formateado con elegancia al usuario.
+  Gemini audita el código o razonamiento devuelto por el ingrediente, verifica que cumpla con las restricciones del proyecto y añade el banner de transparencia correspondiente.
 
 ---
 
@@ -52,4 +65,3 @@ En este entorno, **Gemini actúa como las dos rebanadas de pan** que envuelven l
   ./scripts/sync_github.sh "<mensaje descriptivo>"
   ```
 - Queda terminantemente prohibida cualquier desincronización entre el código local y el repositorio público.
-

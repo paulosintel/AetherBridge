@@ -186,26 +186,28 @@ No necesitas configurar servidores manualmente. Gracias al **Prompt Maestro**, t
 
 ## 5. Catálogo Maestro de Modelos por Cliente (OmniRoute + Ollama)
 
-AetherBridge unifica dos mundos: **más de 1,000 modelos frontera en la nube a costo $0** y **modelos locales ultrarrápidos y 100% privados** que corren en tu propio disco duro.
+AetherBridge unifica dos mundos: **los titanes de frontera de última generación a costo $0** y **modelos locales ultrarrápidos y 100% privados** que corren en tu propio disco duro.
 
-### 🌐 A. Modelos Frontera en la Nube (Vía OmniRoute Gateway en `:20128`)
+### 🌐 A. Titanes de Frontera & Equivalencias Claude (Vía OmniRoute en `:20128`)
 
-| Identificador de Modelo | Tipo / Proveedor | Especialidad Técnica | Velocidad / Ventana |
+Puedes activarlos **escribiendo su nombre directamente en cualquier chat** o dejando que el **Sándwich de Gemini decida según la complejidad de la tarea**:
+
+| Modelo Titán | Equivalencia en Claude | Especialidad Técnica | Activador en Chat |
 | :--- | :--- | :--- | :--- |
-| **`claude-3-7-sonnet`** | Anthropic (Cloud) | Razonamiento híbrido de última generación y codificación premier | Alta precisión |
-| **`claude-3-5-sonnet-latest`** | Anthropic (Cloud) | El estándar indiscutido de ingeniería de software y refactorización | Contexto 200k |
-| **`auto/claude-opus`** | Anthropic (Cloud) | Macro-arquitectura de sistemas complejos y síntesis profunda | Máxima abstracción |
-| **`deepseek-r1`** | DeepSeek (Cloud) | Campeón mundial en matemáticas, algoritmos y lógica formal | Cadena de razonamiento |
-| **`deepseek-v3`** | DeepSeek (Cloud) | Modelo general de frontera para programación y chat | Ultra-eficiente |
-| **`gemini/gemini-3.1-flash-lite`** | Google AI Studio | Ventana colosal de contexto, lectura masiva de repositorios enteros | **1 Millón de tokens** |
-| **`gemini-2.0-pro`** | Google AI Studio | Razonamiento multimodal y análisis de código en proyectos masivos | **1 Millón de tokens** |
-| **`groq/qwen/qwen3.8-27b`** | Groq LPU | Inferencia instantánea en hardware acelerado | **Sub-250ms (+1,000 tok/s)** |
-| **`llama-3.3-70b`** | Cerebras LPU | El modelo abierto más rápido del mundo en chip de oblea | **+1,800 tokens/seg** |
+| **DeepSeek V4 (Pro / Flash) y R2** | **Claude Opus / Sonnet** | Razonamiento matemático extremo, lógica formal profunda y coding de élite | `"deepseek v4"`, `"v4 pro"`, `"v4 flash"`, `"deepseek r2"` |
+| **GLM-5.1 / 5.2 / 5.3-Flash (Z.ai)** | **Claude Opus 4.6** | Macro-arquitectura de sistemas complejos, agentes autónomos y síntesis | `"glm 5"`, `"glm 5.3 flash"`, `"z.ai"` |
+| **Kimi K3 / K2.6 (Moonshot AI)** | **Claude Sonnet / Fable** | Contexto ultra-largo, razonamiento de repositorios completos y lectura técnica | `"kimi"`, `"kimi k3"`, `"kimi k2.6"`, `"moonshot"` |
+| **Qwen 3 / 3.6 (235B MoE y Coder)** | **Claude Sonnet** | Programación masiva multi-archivo, refactorización y depuración profunda | `"qwen 3"`, `"qwen 3.6 coder"`, `"qwen 235b"` |
+| **Gemini 2.5 Pro / Flash** | **Claude Opus / Sonnet** | Multimodal nativo con 2M+ tokens de contexto y latencia sub-segundo | `"gemini 2.5"`, `"gemini 2.5 pro"`, `"gemini 2.5 flash"` |
+| **Nemotron 3 Ultra / gpt-oss-120b** | **Claude Sonnet** | Rendimiento ultra-optimizado NVIDIA y alineación de código empresarial | `"nemotron 3"`, `"nemotron ultra"`, `"gpt-oss-120b"` |
+| **Claude 3.7 / 3.5 Sonnet** | **Claude Sonnet (Nativo)** | Ingeniería de software de referencia y refactorización | `"sonnet"`, `"claude sonnet"` |
+| **Claude 3 Opus** | **Claude Opus (Nativo)** | Visión holística de sistemas, síntesis de alto nivel y filosofía | `"opus"`, `"claude opus"` |
+| **Groq LPU / Cerebras** | **Ultra-Fast Engine** | Inferencia instantánea en hardware acelerado (+1,000 tok/s) | `"fast"`, `"groq"`, `"lpu"` |
 
 #### 🔀 Cascadas Inteligentes (Smart Combos sin Costo)
-- **`auto/best-coding`**: Conmuta automáticamente entre Claude 3.7 Sonnet, Qwen 2.5 Coder y Gemini Flash para programar.
-- **`auto/best-reasoning`**: Cascada optimizada para demostraciones matemáticas y algoritmos (DeepSeek R1 / o3-mini).
-- **`auto/fast`**: Cascada ultra-veloz entre chips LPU de Groq y Cerebras.
+- **`auto/best-coding`**: Conmuta automáticamente entre Claude 3.7 Sonnet, Qwen 3.6 Coder y Gemini Flash para programar.
+- **`auto/best-reasoning`**: Cascada optimizada para demostraciones matemáticas y algoritmos (DeepSeek R2 / R1 / o3-mini).
+- **`auto/fast`**: Cascada ultra-veloz entre chips LPU de Groq, Cerebras y Gemini 2.5 Flash.
 - **`auto/best-free`**: Enruta exclusivamente a través de proveedores con límite gratuito perpetuo.
 
 ---
