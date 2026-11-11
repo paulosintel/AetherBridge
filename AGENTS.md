@@ -1,9 +1,9 @@
 # Reglas de Agente: AetherBridge & Arquitectura Sándwich
 
 ## 🌉 1. Ecosistema AetherBridge
-AetherBridge democratiza el acceso a la IA conectando clientes de desarrollo (Claude CLI / Claude Code, Codex, Antigravity) con:
-- **Proveedores Cloud Gratuitos:** Vía el gateway local OmniRoute en `localhost:20128`.
-- **Nodos Locales Privados:** Vía Ollama en `localhost:11434`.
+AetherBridge democratiza el acceso a la IA conectando clientes de desarrollo (Claude Desktop, Claude CLI / Claude Code, Codex, Antigravity) directamente con:
+- **Proveedores Directos Cloud (Primarios):** Vía el gateway local **OmniRoute - AetherBridge** en `localhost:20128` (Google Gemini, NVIDIA NIM, OpenRouter, Groq y cascadas inteligentes `claude-sonnet-5-5`, `claude-opus-5-5`, `claude-haiku-5-5`, `auto/*`).
+- **Nodos Locales Opcionales:** Vía Ollama en `localhost:11434` únicamente si está instalado y activo en el equipo.
 
 ---
 
@@ -28,10 +28,8 @@ En este entorno, **Gemini actúa como las dos rebanadas de pan** que envuelven l
   - **Complejidad Lógica & Matemática Formal:** Delega a **DeepSeek R2** (Claude Opus/Sonnet equiv) o **DeepSeek V4 Pro**.
   - **Ingeniería de Software & Código Complejo:** Delega a **Qwen 3.6 Coder 235B MoE** (Claude Sonnet equiv) o **Nemotron 3 Ultra**.
   - **Contexto Masivo & Repositorios Extensos:** Delega a **Gemini 2.5 Pro** o **Kimi K3 (Moonshot)**.
-  - **Velocidad Extrema / Sub-segundo:** Delega a **Gemini 2.5 Flash**, **GLM-5.3-Flash** o **Groq LPU**.
-  - **Código Local Privado (Apple Silicon M2):** Delega a **Ollama Local** (`qwen2.5-coder:3b` a 42 tok/s).
-  - **Razonamiento Lógico Local (Apple Silicon M2):** Delega a **Ollama Local** (`deepseek-r1:1.5b` a 75 tok/s con `<think>`).
-  - **Respaldo Offline General:** Delega a **Ollama Local** (`llama3.2:latest`).
+  - **Velocidad Extrema / Sub-segundo:** Delega a **Gemini 3.1 Flash Lite** o `claude-haiku-5-5` / `auto/best-fast`.
+  - **Respaldo Cloud Multi-Proveedor:** Cascada automática entre **Google Gemini**, **NVIDIA NIM** y **OpenRouter (:free)** (y nodo Ollama local únicamente si se encuentra instalado y activo).
 
 - **Ingrediente Central (Especialista AetherBridge / OmniRoute):**
   Se ejecuta el modelo seleccionado a costo $0 mediante:
