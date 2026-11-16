@@ -8,11 +8,23 @@ Ollama local models are only registered if Ollama is active on localhost:11434.
 
 import json
 import os
+import platform
 import re
+import shutil
 import subprocess
 import sys
 import time
 import urllib.request
+
+# Ensure UTF-8 output on Windows consoles
+if sys.platform == "win32":
+    try:
+        if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+            sys.stdout.reconfigure(encoding="utf-8")
+        if sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
+            sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 
 def _read_env_value(filepath: str, keys: tuple) -> str:
@@ -273,12 +285,21 @@ def update_codex_catalog(live_models: list, ollama_active: bool) -> int:
 def sync_cli_profiles(codex_only: bool = False):
     env = os.environ.copy()
     env["OMNIROUTE_API_KEY"] = OMNIROUTE_TOKEN
-    env["PATH"] = f"/usr/local/bin:/opt/homebrew/bin:{env.get('PATH', '')}"
-    omni_bin = "/usr/local/bin/omniroute" if os.path.exists("/usr/local/bin/omniroute") else "omniroute"
+    is_win = platform.system() == "Windows"
+
+    if is_win:
+        appdata = os.environ.get("APPDATA", "")
+        extra_paths = [os.path.join(appdata, "npm"), r"C:\Program Files\nodejs"]
+        env["PATH"] = ";".join(extra_paths) + ";" + env.get("PATH", "")
+        omni_bin = shutil.which("omniroute.cmd") or shutil.which("omniroute") or "omniroute.cmd"
+    else:
+        env["PATH"] = f"/opt/homebrew/bin:/usr/local/bin:{env.get('PATH', '')}"
+        omni_bin = shutil.which("omniroute") or "/opt/homebrew/bin/omniroute" if os.path.exists("/opt/homebrew/bin/omniroute") else ("/usr/local/bin/omniroute" if os.path.exists("/usr/local/bin/omniroute") else "omniroute")
+
     try:
-        subprocess.run([omni_bin, "setup-codex", "--api-key", OMNIROUTE_TOKEN], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([omni_bin, "setup-codex", "--api-key", OMNIROUTE_TOKEN], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=is_win)
         if not codex_only:
-            subprocess.run([omni_bin, "setup-claude", "--api-key", OMNIROUTE_TOKEN], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run([omni_bin, "setup-claude", "--api-key", OMNIROUTE_TOKEN], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=is_win)
     except Exception as e:
         print(f"[AutoUpdate] Notice syncing CLI profiles: {e}", file=sys.stderr)
 

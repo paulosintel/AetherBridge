@@ -6,6 +6,9 @@
 
 set -e
 
+# Cambiar a la raíz del repositorio
+cd "$(dirname "$0")/.."
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -28,7 +31,7 @@ fi
 TOKEN="${TOKEN:-omniroute-secret-key-local}"
 
 # 1. Verificar estado del Gateway OmniRoute (Motor central)
-echo -ne "\n[1/5] Verificando Gateway OmniRoute en puerto ${PORT}... "
+echo -ne "\n[1/6] Verificando Gateway OmniRoute en puerto ${PORT}... "
 if curl -s -H "Authorization: Bearer ${TOKEN}" http://localhost:${PORT}/v1/models | grep -q '"data"'; then
     echo -e "${GREEN}ONLINE y RESPONDIENDO (localhost:${PORT})${NC}"
     MODELS_COUNT=$(curl -s -H "Authorization: Bearer ${TOKEN}" http://localhost:${PORT}/v1/models 2>/dev/null | grep -o '"id":' | wc -l | tr -d ' ')
@@ -37,24 +40,46 @@ if curl -s -H "Authorization: Bearer ${TOKEN}" http://localhost:${PORT}/v1/model
     fi
 else
     echo -e "${YELLOW}OFFLINE o NO RESPONDE.${NC}"
-    echo -e "      Tip: Inicia el motor con 'omniroute serve'."
+    echo -e "      Tip: Inicia el servicio con 'python3 scripts/aether_service.py start'."
 fi
 
-# 2. Verificar archivo de claves API
-echo -ne "\n[2/5] Verificando credenciales 'api_keys.env'... "
+# 2. Verificar archivo de claves API y sincronización
+echo -ne "\n[2/6] Verificando credenciales 'api_keys.env' y sincronización... "
 if [ -f "api_keys.env" ]; then
     KEYS_COUNT=$(grep -v '^#' api_keys.env | grep -v '^[[:space:]]*$' | grep -c '=')
-    echo -e "${GREEN}ENCONTRADO (${KEYS_COUNT} claves/variables detectadas)${NC}"
+    if [ -f "${HOME}/.omniroute/.env" ]; then
+        echo -e "${GREEN}SINCRONIZADO (${KEYS_COUNT} claves/variables detectadas)${NC}"
+    else
+        echo -e "${YELLOW}LOCAL PRESENTE (${KEYS_COUNT} claves), falta sincronizar con ~/.omniroute/.env${NC}"
+        echo -e "      Tip: Ejecuta 'python3 scripts/aether_service.py sync'."
+    fi
 elif [ -f "api_keys.env.example" ]; then
     echo -e "${YELLOW}SOLO PLANTILLA DETECTADA (api_keys.env.example)${NC}"
 else
     echo -e "${RED}NO ENCONTRADO.${NC}"
 fi
 
-# 3. Verificar configuración para Claude CLI y Claude Desktop
-echo -ne "\n[3/5] Verificando cableado de Claude CLI y Claude Desktop... "
+# 3. Verificar persistencia de inicio automático (LaunchAgent / systemd)
+echo -ne "\n[3/6] Verificando persistencia de servicio en segundo plano (Daemon)... "
+DAEMON_OK=false
+if [ "$(uname)" = "Darwin" ]; then
+    if [ -f "${HOME}/Library/LaunchAgents/com.aetherbridge.omniroute.plist" ]; then
+        echo -e "${GREEN}CONFIGURADO (macOS LaunchAgent activo al encender o despertar)${NC}"
+        DAEMON_OK=true
+    fi
+elif [ -f "${HOME}/.config/systemd/user/aetherbridge-omniroute.service" ]; then
+    echo -e "${GREEN}CONFIGURADO (systemd user service activo)${NC}"
+    DAEMON_OK=true
+fi
+if [ "$DAEMON_OK" = false ]; then
+    echo -e "${YELLOW}NO CONFIGURADO (Solo manual)${NC}"
+    echo -e "      Tip: Ejecuta 'python3 scripts/aether_service.py install-daemon' para autoinicio."
+fi
+
+# 4. Verificar configuración para Claude CLI y Claude Desktop
+echo -ne "\n[4/6] Verificando cableado de Claude CLI y Claude Desktop... "
 SETTINGS_FILE="${HOME}/.claude/settings.json"
-DESKTOP_META="${HOME}/Library/Application Support/Claude-3p/configLibrary/_meta.json"
+DESKTOP_CONFIG="${HOME}/Library/Application Support/Claude/claude_desktop_config.json"
 CLI_OK=false
 DESKTOP_OK=false
 
@@ -64,41 +89,44 @@ elif [ -n "$ANTHROPIC_BASE_URL" ]; then
     CLI_OK=true
 fi
 
-if [ -f "$DESKTOP_META" ] && grep -q "appliedId" "$DESKTOP_META"; then
+if [ -f "$DESKTOP_CONFIG" ] && grep -q "omniroute_mcp_bridge" "$DESKTOP_CONFIG"; then
     DESKTOP_OK=true
 fi
 
 if [ "$CLI_OK" = true ] && [ "$DESKTOP_OK" = true ]; then
-    echo -e "${GREEN}CONFIGURADO (Claude CLI + Claude Desktop 3P Gateway)${NC}"
+    echo -e "${GREEN}CONFIGURADO (Claude CLI + Claude Desktop MCP -> OmniRoute)${NC}"
 elif [ "$CLI_OK" = true ]; then
     echo -e "${GREEN}CONFIGURADO (Claude CLI -> localhost:${PORT})${NC}"
 else
     echo -e "${YELLOW}SIN CONFIGURAR.${NC}"
+    echo -e "      Tip: Ejecuta 'python3 scripts/aether_service.py sync' para auto-configurar."
 fi
 
-# 4. Verificar si Ollama está instalado (Opcional)
-echo -ne "\n[4/5] Verificando nodo local Ollama (Opcional)... "
+# 5. Verificar si Ollama está instalado (Opcional)
+echo -ne "\n[5/6] Verificando nodo local Ollama (Opcional)... "
 if command -v ollama >/dev/null 2>&1 && curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
     echo -e "${GREEN}ACTIVO (localhost:11434)${NC}"
 else
     echo -e "${CYAN}OPCIONAL — No activo (operando 100% vía OmniRoute Cloud Directo)${NC}"
 fi
 
-# 5. Verificar scripts auxiliares de AetherBridge
-echo -ne "\n[5/5] Verificando suite de scripts AetherBridge en scripts/... "
+# 6. Verificar scripts auxiliares de AetherBridge
+echo -ne "\n[6/6] Verificando suite de scripts AetherBridge en scripts/... "
 SCRIPTS_OK=true
-for f in scripts/gemini_sandwich.py scripts/aether_consult.py scripts/omni_consult.py scripts/omniroute_mcp_bridge.js; do
+for f in scripts/aether_service.py scripts/gemini_sandwich.py scripts/aether_consult.py scripts/auto_update_catalog.py scripts/omniroute_mcp_bridge.js; do
     if [ ! -f "$f" ]; then
         SCRIPTS_OK=false
     fi
 done
 
 if [ "$SCRIPTS_OK" = true ]; then
-    echo -e "${GREEN}SUITE COMPLETA (Sandwich, Consult, MCP Bridge)${NC}"
+    echo -e "${GREEN}SUITE COMPLETA (Service Daemon, Sandwich, Consult, MCP Bridge, AutoUpdate)${NC}"
 else
     echo -e "${YELLOW}Faltan algunos scripts en la carpeta scripts/${NC}"
 fi
 
 echo -e "\n${CYAN}=================================================================${NC}"
-echo -e "${GREEN}  Diagnóstico finalizado con éxito.                              ${NC}"
-echo -e "${CYAN}=================================================================${NC}\n"
+echo -e "${GREEN}  Diagnóstico finalizado. Para autoinicio permanente:${NC}"
+echo -e "  python3 scripts/aether_service.py start"
+echo -e "  python3 scripts/aether_service.py install-daemon"
+echo -e "${CYAN}=================================================================${NC}"

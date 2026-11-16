@@ -103,23 +103,40 @@ Si prefieres usar la app de ventana oficial de Claude en lugar de la terminal:
 > **¡Buenas noticias!** No necesitas instalar Linux, ni máquinas virtuales, ni configurar WSL2. AetherBridge corre **100% de forma nativa en Windows 10 y Windows 11**.
 
 ### Los 3 pasos en Windows:
-1. **Instala Ollama para Windows:**  
-   Descarga el instalador oficial desde [ollama.com/download/windows](https://ollama.com/download/windows) y dale a Siguiente, Siguiente. (O abre PowerShell y escribe `winget install Ollama.Ollama`).
-2. **Instala Node.js (si no lo tienes):**  
+1. **Instala Node.js (si no lo tienes):**  
    Descárgalo desde [nodejs.org](https://nodejs.org/) versión LTS (o escribe `winget install OpenJS.NodeJS`).
-3. **Pega el Prompt Maestro en tu asistente:**  
-   Abre esta carpeta en tu editor (**Antigravity**, **Codex**, etc.), abre [`PROMPT_MAESTRO.md`](PROMPT_MAESTRO.md), cópialo y pégalo en el chat.  
-   Tu asistente detectará Windows y configurará todo de manera transparente.
-4. **Comprobación con un solo clic:**  
-   En Windows puedes simplemente hacer doble clic sobre el archivo [`scripts/verify_setup.bat`](scripts/verify_setup.bat) o ejecutar en PowerShell:
-   ```powershell
-   python scripts\verify_setup.py
-   ```
+2. **Prepara tus claves:**  
+   Copia `api_keys.env.example` como `api_keys.env` y pega tus claves gratuitas (ej. Google Gemini o Groq).
+3. **Arranque en 1 Solo Clic:**  
+   Haz **doble clic** directamente sobre el archivo:
+   👉 **`AetherBridge_Start_Windows.bat`**  
+   El iniciador:
+   - Sincroniza tus claves con el sistema.
+   - Levanta el gateway en segundo plano sin dejar ventanas negras abiertas.
+   - Instala el demonio de inicio automático permanente para que no se apague al suspender o reiniciar tu laptop Huawei/PC.
+   - Abre Claude CLI conectado automáticamente.
+
+---
+
+## 🍎 Guía Rápida para Usuarios de macOS (MacBook & Mac mini)
+
+¿Usas una **MacBook** (portátil) o una **Mac mini**?
+En las laptops, al cerrar la pantalla o suspender el equipo, los procesos de terminal comunes suelen apagarse. Con AetherBridge no tendrás ese problema gracias al nuevo demonio `launchd`:
+
+1. **Arranque en 1 Solo Clic en Finder:**  
+   Haz **doble clic** sobre el archivo:  
+   👉 **`AetherBridge_Start_Mac.command`**
+2. El script sincroniza tus claves a `~/.omniroute/.env`, instala el servicio permanente en `~/Library/LaunchAgents` y levanta el gateway.  
+3. A partir de ese momento, tu MacBook mantendrá el gateway activo permanentemente, incluso si cierras la tapa o reinicias.
 
 ---
 
 ## ❓ Preguntas Frecuentes
 
+- **¿Por qué antes funcionaba bien en la Mac mini pero fallaba en la MacBook o en la Windows Huawei?**  
+  Por dos razones técnicas fundamentales que ya quedaron resueltas:  
+  1. *El proceso moría al suspender la laptop:* Una Mac mini suele estar enchufada y no suspende agresivamente, mientras que las portátiles (MacBook o Huawei) suspenden la red y cierran subprocesos al bajar la tapa. Ahora, con `install-daemon` (LaunchAgent en Mac y Startup invisible en Windows), el servicio se mantiene vivo de forma permanente.  
+  2. *Sincronización de claves:* El motor OmniRoute lee las claves desde la carpeta de usuario (`~/.omniroute/.env`), mientras que el usuario suele escribirlas en `api_keys.env` dentro de la carpeta descargada. El nuevo `aether_service.py sync` y los iniciadores de 1 clic sincronizan ambos archivos automáticamente al instante.
 - **¿Cómo sé exactamente qué modelo me está respondiendo en Claude?**  
   AetherBridge incluye una directiva de transparencia obligatoria. En la primera línea de cada respuesta, Claude colocará un banner informativo como este:
   `> 🌉 [AetherBridge] Modelo: Claude 3.7 Sonnet | Backend: OmniRoute Cloud`  

@@ -12,6 +12,16 @@ import sys
 import urllib.error
 import urllib.request
 
+# Ensure UTF-8 output on Windows consoles
+if sys.platform == "win32":
+    try:
+        if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+            sys.stdout.reconfigure(encoding="utf-8")
+        if sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
+            sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 
 def _read_env_value(filepath: str, keys: tuple) -> str:
     if not os.path.isfile(filepath):

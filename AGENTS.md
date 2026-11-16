@@ -56,6 +56,20 @@ En este entorno, **Gemini actúa como las dos rebanadas de pan** que envuelven l
 
 ---
 
+## 🛠️ 3.1. Gestión de Persistencia y Servicio Multi-Plataforma
+Para garantizar estabilidad 100% fluida en laptops (MacBook, Windows Huawei/PC) y desktops (Mac mini):
+- **Sincronización de credenciales:**
+  `python3 scripts/aether_service.py sync`
+- **Arranque y verificación del gateway:**
+  `python3 scripts/aether_service.py start`
+- **Instalación de persistencia permanente (LaunchAgent en Mac / Startup invisible en Windows):**
+  `python3 scripts/aether_service.py install-daemon`
+- **Iniciadores en 1 Clic:**
+  - En Windows: `AetherBridge_Start_Windows.bat`
+  - En macOS: `AetherBridge_Start_Mac.command`
+
+---
+
 ## ⚡ 4. Regla Inquebrantable de Sincronización Inmediata con GitHub
 - Repositorio oficial público: `https://github.com/paulosintel/AetherBridge`
 - **Mandato:** CUALQUIER mejora técnica, corrección de bug, nuevo script o actualización de documentación realizada en el entorno local **DEBE ser sincronizada y enviada a GitHub inmediatamente** en el mismo turno mediante:

@@ -158,7 +158,19 @@ flowchart TD
 
 ---
 
-## 4. Despliegue en 3 Minutos: Tu Agente como SysAdmin
+## 4. Despliegue en 3 Minutos: Tu Agente como SysAdmin o en 1 Solo Clic
+
+### 🚀 Método A: Arranque Directo en 1 Clic (Sin Comandos)
+- **En Windows (Huawei, Lenovo, Dell, HP, etc.):**  
+  Haz doble clic en: 👉 **`AetherBridge_Start_Windows.bat`**  
+  *(Sincroniza claves, instala el demonio invisible en segundo plano, levanta el puerto 20128 y abre Claude CLI).*
+- **En macOS (MacBook o Mac mini):**  
+  Haz doble clic en: 👉 **`AetherBridge_Start_Mac.command`**  
+  *(Sincroniza claves, instala el LaunchAgent persistente para que no muera al cerrar la tapa de tu MacBook y activa el gateway).*
+
+---
+
+### 🧙‍♂️ Método B: Despliegue Asistido con el Prompt Maestro
 
 No necesitas configurar servidores manualmente. Gracias al **Prompt Maestro**, tu propio agente de desarrollo (**Antigravity**, **Codex**, o **Claude Code**) actuará como ingeniero DevOps en tu computadora:
 
@@ -176,8 +188,8 @@ No necesitas configurar servidores manualmente. Gracias al **Prompt Maestro**, t
 3. **Ejecuta el Prompt Maestro:**  
    Abre el archivo [`PROMPT_MAESTRO.md`](PROMPT_MAESTRO.md), copia su contenido y pégalo en tu agente.  
    El agente:
-   - Verificará los servicios y descargará un modelo local (`llama3.2`).
-   - Levantará el gateway en el puerto `20128`.
+   - Sincronizará las claves hacia `~/.omniroute/.env`.
+   - Levantará el gateway persistente en el puerto `20128`.
    - Conectará tus clientes de desarrollo automáticamente.
 
 ---
@@ -330,9 +342,10 @@ Para que siempre sepas con certeza **qué modelo está contestando**, si se acti
 
 ### 🛡️ Cómo AetherBridge Erradica este Problema de Raíz:
 
-1. **Persistencia del Gateway (Auto-Arranque con el Sistema):**  
-   - En macOS: Se incluye el demonio LaunchAgent `com.omniroute.serve` que inicia el gateway automáticamente al encender el ordenador.
-   - En Windows: Se ejecuta como servicio persistente o tarea programada.
+1. **Gestor Universal de Servicio y Persistencia (`scripts/aether_service.py`):**  
+   - En macOS (MacBook y Mac mini): Instala el LaunchAgent `com.aetherbridge.omniroute.plist` (`install-daemon`), garantizando que el gateway no muera al cerrar la tapa de tu laptop o al reiniciar.
+   - En Windows (Huawei, Lenovo, etc.): Crea el servicio invisible de inicio automático en segundo plano sin abrir consolas negras.
+   - Sincronización automática de credenciales: Lee `api_keys.env` y lo replica en `~/.omniroute/.env`, eliminando cualquier error de credenciales no cargadas.
 2. **Configuración en Archivo de Usuario (No Variables Volátiles):**  
    AetherBridge escribe de forma fija en `~/.claude/settings.json` o `%USERPROFILE%\.claude\settings.json`. Aunque reinicies tu máquina o abras 50 terminales distintas, Claude CLI siempre sabrá conectarse a AetherBridge.
 3. **Cascada Inmortal Anti-429 (Matriz de Resiliencia):**  
@@ -345,7 +358,7 @@ Para que siempre sepas con certeza **qué modelo está contestando**, si se acti
    python scripts/verify_setup.py
    # En Windows: doble clic en scripts\verify_setup.bat
    ```
-   El script audita los 5 puntos críticos en 2 segundos y te indica exactamente la solución.
+   El script audita los 6 puntos críticos en 2 segundos y te indica exactamente la solución.
 
 ---
 
@@ -353,8 +366,24 @@ Para que siempre sepas con certeza **qué modelo está contestando**, si se acti
 
 La carpeta [`scripts/`](scripts/) incluye utilidades de nivel de producción listas para usar:
 
-### 1. Diagnóstico del Sistema Universal (`scripts/verify_setup.py`)
-Verifica con un solo comando que Ollama, el gateway, tus claves API y Claude CLI estén en verde en cualquier sistema:
+### 1. Administrador Universal de Servicio y Demonio (`scripts/aether_service.py`)
+Controla el ciclo de vida completo del Gateway OmniRoute, la sincronización de claves y la persistencia:
+```bash
+# Sincronizar credenciales: api_keys.env -> ~/.omniroute/.env
+python scripts/aether_service.py sync
+
+# Levantar el gateway en segundo plano (puerto 20128)
+python scripts/aether_service.py start
+
+# Instalar demonio permanente (LaunchAgent en Mac / Startup en Windows)
+python scripts/aether_service.py install-daemon
+
+# Ver estado completo de salud y puertos
+python scripts/aether_service.py status
+```
+
+### 2. Diagnóstico del Sistema Universal (`scripts/verify_setup.py`)
+Verifica con un solo comando que Ollama, el gateway, tus claves API, el demonio persistente y Claude CLI estén en verde en cualquier sistema:
 ```bash
 # Universal (Windows, macOS, Linux):
 python scripts/verify_setup.py

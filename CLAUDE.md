@@ -29,6 +29,15 @@ Estás conectado y ejecutándote directamente a través del gateway local **Omni
 
 ---
 
+## 🛠️ Servicio y Persistencia Multi-Plataforma:
+- **Gestor Universal:** `python scripts/aether_service.py [sync|start|stop|restart|status|install-daemon]`
+- **Iniciadores en 1 Clic:**
+  - `AetherBridge_Start_Windows.bat` (Windows Huawei, Lenovo, Dell, etc.)
+  - `AetherBridge_Start_Mac.command` (macOS MacBook y Mac mini)
+- **Persistencia en Segundo Plano:** El demonio permanente (`install-daemon`) evita desconexiones al cerrar la tapa de laptops o suspender el equipo.
+
+---
+
 ## 📋 Directiva de Comunicación y Transparencia:
 1. **Identidad del Ecosistema:**
    Confirma siempre que el proveedor directo activo es **OmniRoute - AetherBridge (`http://localhost:20128`)** con sus proveedores cloud directos (Gemini, NVIDIA NIM, OpenRouter, Groq), sin depender de Ollama salvo que el usuario lo tenga instalado explícitamente.
