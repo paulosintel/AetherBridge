@@ -168,6 +168,169 @@ def patch_claude_cli_settings(port: str, token: str):
         pass
 
 
+def configure_claude_full():
+    sync_environments()
+    port, token = get_active_config()
+    print(f"{CYAN}================================================================={RESET}")
+    print(f"{CYAN}   🤖 AETHERBRIDGE: CONFIGURANDO CLAUDE CODE, CLI & DESKTOP      {RESET}")
+    print(f"{CYAN}================================================================={RESET}")
+
+    # 1. Patch ~/.claude/settings.json
+    patch_claude_cli_settings(str(port), token)
+    print(f"{GREEN}✓ Configuración de Claude Code (CLI) guardada en ~/.claude/settings.json{RESET}")
+    print(f"  ANTHROPIC_BASE_URL: http://localhost:{port}")
+    print(f"  ANTHROPIC_AUTH_TOKEN: {token}")
+
+    # 2. Run omniroute setup-claude
+    omni_bin = get_omniroute_bin()
+    if omni_bin:
+        env = os.environ.copy()
+        env["OMNIROUTE_API_KEY"] = token
+        try:
+            subprocess.run([omni_bin, "setup-claude", "--api-key", token, "--port", str(port)], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print(f"{GREEN}✓ Perfiles de Claude Code generados en ~/.claude/profiles/{RESET}")
+        except Exception as e:
+            print(f"{YELLOW}Aviso generando perfiles de Claude CLI: {e}{RESET}")
+
+    # 3. If macOS, configure Claude-3p configLibrary for Claude Desktop Custom Provider
+    system = platform.system()
+    if system == "Darwin":
+        c3p_dir = os.path.expanduser("~/Library/Application Support/Claude-3p/configLibrary")
+        try:
+            os.makedirs(c3p_dir, exist_ok=True)
+            meta_file = os.path.join(c3p_dir, "_meta.json")
+            meta_data = {
+                "appliedId": "ae74eb00-0000-4000-8000-000000020128",
+                "entries": [
+                    {
+                        "id": "ae74eb00-0000-4000-8000-000000020128",
+                        "name": "OmniRoute - AetherBridge"
+                    }
+                ]
+            }
+            with open(meta_file, "w", encoding="utf-8") as f:
+                json.dump(meta_data, f, indent=2)
+
+            prov_file = os.path.join(c3p_dir, "ae74eb00-0000-4000-8000-000000020128.json")
+            prov_data = {
+                "autoModeEnabled": True,
+                "chatTabEnabled": True,
+                "coworkEgressAllowedHosts": ["*"],
+                "deploymentDisplayName": "OmniRoute - AetherBridge",
+                "disableDeploymentModeChooser": True,
+                "disableEssentialTelemetry": True,
+                "disableNonessentialTelemetry": True,
+                "inferenceGatewayApiKey": token,
+                "inferenceGatewayAuthScheme": "bearer",
+                "inferenceGatewayBaseUrl": f"http://127.0.0.1:{port}",
+                "inferenceModels": [
+                    {
+                        "anthropicFamilyTier": "opus",
+                        "behavesAs": "claude-opus-4-6",
+                        "isFamilyDefault": True,
+                        "labelOverride": "OmniRoute Opus (AetherBridge)",
+                        "maxEffort": "high",
+                        "name": "claude-opus-5-5"
+                    },
+                    {
+                        "anthropicFamilyTier": "sonnet",
+                        "behavesAs": "claude-sonnet-4-5",
+                        "isFamilyDefault": True,
+                        "labelOverride": "OmniRoute Sonnet (AetherBridge)",
+                        "maxEffort": "high",
+                        "name": "claude-sonnet-5-5",
+                        "supports1m": True
+                    },
+                    {
+                        "anthropicFamilyTier": "haiku",
+                        "behavesAs": "claude-haiku-4-5",
+                        "isFamilyDefault": True,
+                        "labelOverride": "OmniRoute Haiku (AetherBridge)",
+                        "name": "claude-haiku-5-5"
+                    },
+                    {
+                        "anthropicFamilyTier": "sonnet",
+                        "behavesAs": "claude-sonnet-4-5",
+                        "labelOverride": "AetherBridge Best Coding",
+                        "name": "auto/best-coding",
+                        "supports1m": True
+                    },
+                    {
+                        "anthropicFamilyTier": "opus",
+                        "behavesAs": "claude-opus-4-6",
+                        "labelOverride": "AetherBridge Best Reasoning",
+                        "name": "auto/best-reasoning"
+                    },
+                    {
+                        "anthropicFamilyTier": "haiku",
+                        "behavesAs": "claude-haiku-4-5",
+                        "labelOverride": "AetherBridge Ultra-Fast",
+                        "name": "auto/best-fast"
+                    }
+                ],
+                "inferenceProvider": "gateway"
+            }
+            with open(prov_file, "w", encoding="utf-8") as f:
+                json.dump(prov_data, f, indent=2)
+            print(f"{GREEN}✓ Proveedor Claude Desktop (Claude-3p) configurado con selector de modelos:{RESET}")
+            print(f"  - OmniRoute Opus (AetherBridge) [opus / claude-opus-5-5]")
+            print(f"  - OmniRoute Sonnet (AetherBridge) [sonnet / claude-sonnet-5-5]")
+            print(f"  - OmniRoute Sonnet (AetherBridge) [1M context window]")
+            print(f"  - OmniRoute Haiku (AetherBridge) [haiku / claude-haiku-5-5]")
+        except Exception as e:
+            print(f"{YELLOW}Aviso configurando Claude-3p: {e}{RESET}")
+
+    # 4. Configure Claude Desktop Official MCP config
+    mcp_script = os.path.join(REPO_ROOT, "scripts", "omniroute_mcp_bridge.js")
+    node_bin = get_node_bin() or "node"
+    desktop_conf_path = ""
+    if system == "Darwin":
+        desktop_conf_path = os.path.expanduser("~/Library/Application Support/Claude/claude_desktop_config.json")
+    elif system == "Windows":
+        desktop_conf_path = os.path.expandvars(r"%APPDATA%\Claude\claude_desktop_config.json")
+
+    if desktop_conf_path:
+        try:
+            os.makedirs(os.path.dirname(desktop_conf_path), exist_ok=True)
+            ddata = {}
+            if os.path.isfile(desktop_conf_path):
+                try:
+                    with open(desktop_conf_path, "r", encoding="utf-8") as f:
+                        ddata = json.load(f)
+                except Exception:
+                    ddata = {}
+            mcp_servers = ddata.get("mcpServers", {})
+            mcp_servers["aetherbridge"] = {
+                "command": node_bin,
+                "args": [mcp_script.replace("\\", "/")],
+                "env": {
+                    "OMNIROUTE_URL": f"http://127.0.0.1:{port}",
+                    "OMNIROUTE_TOKEN": token,
+                    "OLLAMA_URL": "http://127.0.0.1:11434"
+                }
+            }
+            ddata["mcpServers"] = mcp_servers
+            with open(desktop_conf_path, "w", encoding="utf-8") as f:
+                json.dump(ddata, f, indent=2)
+            print(f"{GREEN}✓ Servidor MCP para Claude Desktop configurado exitosamente.{RESET}")
+        except Exception as e:
+            print(f"{YELLOW}Aviso configurando MCP en Claude Desktop: {e}{RESET}")
+
+    # 5. Live validation test
+    print(f"\n{BOLD}Validando conexión de Claude CLI contra Gateway...{RESET} ", end="")
+    ok, count, msg = test_gateway_response(port, token)
+    if ok:
+        print(f"{GREEN}ÉXITO (Gateway respondiendo con {count} modelos cloud).{RESET}")
+    else:
+        print(f"{YELLOW}El gateway aún no está corriendo en :{port}. Ejecuta 'python scripts/aether_service.py start'.{RESET}")
+
+    print(f"\n{CYAN}================================================================={RESET}")
+    print(f"{GREEN}  Configuración de Claude completada al 100%.                     {RESET}")
+    print(f"  Para abrir Claude Code (CLI) en terminal:  claude               ")
+    print(f"  Para abrir Claude Desktop con OmniRoute:   Reinicia la app Claude")
+    print(f"{CYAN}================================================================={RESET}\n")
+
+
 def find_executable(name: str, extra_paths=None) -> str:
     """Cross-platform binary lookup handling Windows .cmd/.exe and Mac homebrew/nvm."""
     search_paths = []
@@ -662,7 +825,7 @@ def print_status():
 
 def main():
     parser = argparse.ArgumentParser(description="AetherBridge Service & Daemon Manager")
-    parser.add_argument("action", choices=["start", "stop", "restart", "status", "sync", "install-daemon", "uninstall-daemon"], default="status", nargs="?", help="Action to execute")
+    parser.add_argument("action", choices=["start", "stop", "restart", "status", "sync", "install-daemon", "uninstall-daemon", "setup-claude"], default="status", nargs="?", help="Action to execute")
     parser.add_argument("--foreground", action="store_true", help="Run OmniRoute in the current foreground console")
 
     args = parser.parse_args()
@@ -670,6 +833,8 @@ def main():
     if args.action == "sync":
         env = sync_environments()
         print(f"{GREEN}✓ Credenciales y configuración sincronizadas correctamente en ~/.omniroute/.env ({len(env)} variables).{RESET}")
+    elif args.action == "setup-claude":
+        configure_claude_full()
     elif args.action == "start":
         start_service(foreground=args.foreground)
     elif args.action == "stop":
